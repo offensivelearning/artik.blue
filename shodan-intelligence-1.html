@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+        <title>Generating contextual geographic intelligence with shodan</title>
+        <meta name="description" content="About shodan Shodan.io is the world known search engine that is continously indexing ipv4/ipv6 hosts connected to the internet and lets you search them by us...">
+        <link rel="canonical" href="shodan-intelligence-1.html">
+    
+
+    <!-- Site Favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/png" />
+
+    <!-- Font Embed Code -->
+    <link href="https://fonts.googleapis.com/css?family=Karla:400,400i,700,700i" rel="stylesheet" />
+
+    <!-- CSS Styles -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/light.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+    
+
+</head>
+
+
+
+<body class="layout-post">
+    <div id="page" class="site">
+
+        
+        <header id="masthead" class="site-header outer">
+    <div class="site-header-inside">
+        <div class="site-branding">
+            
+                <p class="site-logo"><a href="index.html" rel="home"><img src="assets/images/logo.png" alt="Artik blue" /></a></p>
+                <h1 class="site-title screen-reader-text"><a href="shodan-intelligence-1.html" rel="home">Artik blue digital thoughts</a></h1>
+            
+        </div><!-- .site-branding -->
+        <nav id="main-navigation" class="site-navigation" aria-label="Primary Navigation">
+            <ul class="menu">
+            
+                <li class="menu-item"><a href="about.html">About</a></li>
+            
+                <li class="menu-item"><a href="reversing.html">Reversing</a></li>
+            
+            </ul>
+            <button id="sidebar-show" class="sidebar-toggle"><span class="screen-reader-text">Open Sidebar</span><span class="icon-more" aria-hidden="true"></span></button>
+        </nav><!-- .site-navigation -->
+    </div><!-- .site-header-inside -->
+</header><!-- .site-header -->
+        
+
+        <div id="content" class="site-content fadeInDown delay_075s">
+    <main id="main" class="site-main outer">
+        <article class="post-full inner">
+            <header class="post-header">
+                <div class="post-meta">
+                    <time class="post-date" datetime="2020-12-01">December 1,
+                        2020</time>
+                </div><!-- .post-meta -->
+                <h1 class="posttitle">Generating contextual geographic intelligence with shodan</h1>
+            </header><!-- .post-header -->
+            
+            <div class="post-thumbnail"><img class="featured-image img-fluid" src="assets/images/shodan.png"
+                    alt="Generating contextual geographic intelligence with shodan"></div>
+            
+            <div class="post-content">
+                <h3 id="about-shodan">About shodan</h3>
+<p><a href="https://shodan.io">Shodan.io</a> is the world known search engine that is continously indexing ipv4/ipv6 hosts connected to the internet and lets you search them by using a wide range of filters such as: network, country, ip or port. 
+<!--more--></p>
+
+<p>How shodan works internally is still a “mystery” but we can guess that shodan has a certain number of systems that are scanning and re scanning the (whole) internet 24/7 and indexing the results. I guess that shodan identifies features such as location or organisation by gathering and studying information related to ISP companies and IP network ranges. This hypothesis seems reasonable as tools such as <a href="https://zmap.io/">zmap</a> let you scan the <em>whole</em> internet in a matter of minutes.</p>
+
+<p>So with shodan we can search for devices that are connected to the internet. The services is focused to the device, so instead of google, in here we are able to look for web apps, ports, custom apps or whatever, not just web pages. This services can be used for multiple purposes, for example it can be used by attackers or pentesters to audit a specific network looking for some specific application or to mass attack a specific vulnerability, it can also be used by social scientists or industrial researchers to know more about the impact of a certain technology in the world. On this post I’m going to show you how shodan can be useful for analysts for detecting infrastructures on different countries.</p>
+
+<p>Some interesting things that you have to take into account related to shodan are:</p>
+<ol>
+  <li>You see N hosts up after a search on shodan, there can be more hosts out there than the ones that appear in shodan.</li>
+  <li>By using shodan, those hosts won’t detect that YOU are scanning them, but shodan will know what you are doing.</li>
+  <li>Shodan offers different kinds of access to the platform, if you want to do serious stuff get you’ll have to pay a lot.</li>
+</ol>
+
+<p>For this intro post I’m using a simple account with a basic developer license I got by paying 10$ due to an offer. It let’s me perform 100 searches a month.</p>
+<h4 id="queries-and-filters">Queries and filters</h4>
+<p>You can just hit the shodan search bar and type something like “apache” and yes, that will probably show you hosts containing the apache server service, but it may also show you hosts running nginx with apps containing the word apache and there are ways to be more accurate. Shodan works well with filters, a filter like port:80 will show you hosts with port 80 open. Filters can be concatenated so port:80 and country:US will show you hosts in the US with port 80 open. You can also use parentheses () and the OR keyword to perform advanced searches.</p>
+<h5 id="filters">Filters</h5>
+<p>Here you can find some of the filters that I find more useful:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th>Query</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>after</td>
+      <td>Only show results after the given date (dd/mm/yyyy) string</td>
+    </tr>
+    <tr>
+      <td>before</td>
+      <td>Only show results before the given date (dd/mm/yyyy) string</td>
+    </tr>
+    <tr>
+      <td>city</td>
+      <td>Name of the city string</td>
+    </tr>
+    <tr>
+      <td>country</td>
+      <td>2-letter country code string</td>
+    </tr>
+    <tr>
+      <td>geo</td>
+      <td>lat,lon, kms arround</td>
+    </tr>
+    <tr>
+      <td>net</td>
+      <td>Network range in CIDR notation (ex. 199.4.1.0/24) string</td>
+    </tr>
+    <tr>
+      <td>org</td>
+      <td>Organization assigned the netblock string</td>
+    </tr>
+    <tr>
+      <td>port</td>
+      <td>Port number for the service integer</td>
+    </tr>
+    <tr>
+      <td>vuln</td>
+      <td>CVE ID for a vulnerability string</td>
+    </tr>
+    <tr>
+      <td>http.title</td>
+      <td>Title for the web banners website</td>
+    </tr>
+    <tr>
+      <td>http.status</td>
+      <td>Response status code</td>
+    </tr>
+    <tr>
+      <td>has_screenshot</td>
+      <td>True/ False boolean</td>
+    </tr>
+  </tbody>
+</table>
+
+<h5 id="interesting-queries">Interesting queries</h5>
+<p>Now that you know some filters, the possibilities are big. Shodan is a tool that is specially useful if you <em>already know what you are doing</em> so for example if you are an ICS expert and want to look for a specific vulnerabilitty it will work miracles for you, as you’ll probably know many <em>service banners</em> related to the ICS systems that you are looking for.</p>
+
+<p>You can find plenty of interesting search queries out there, people use shodan to find stuff that goes from webcaams, outdated software or even gas stations or drones. Some juicy search queries can be found here:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th>Query</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Gas Station Pump Controllers</td>
+      <td>“in-tank inventory” port:10001</td>
+    </tr>
+    <tr>
+      <td>Traffic Light Controllers / Red Light Cameras</td>
+      <td>mikrotik streetlight</td>
+    </tr>
+    <tr>
+      <td>Telcos Running Cisco Lawful Intercept Wiretaps</td>
+      <td>“Cisco IOS” “ADVIPSERVICESK9_LI-M”</td>
+    </tr>
+    <tr>
+      <td>Submarine Mission Control Dashboards</td>
+      <td>title:”Slocum Fleet Mission Control”</td>
+    </tr>
+    <tr>
+      <td>Railroad Management</td>
+      <td>“log off” “select the appropriate”</td>
+    </tr>
+    <tr>
+      <td>Unprotected VNC</td>
+      <td>“authentication disabled” “RFB 003.008”</td>
+    </tr>
+    <tr>
+      <td>MongoDBs</td>
+      <td>“MongoDB Server Information” port:27017 -authentication</td>
+    </tr>
+    <tr>
+      <td>FTP Servers with Anonymous Login</td>
+      <td>“220” “230 Login successful.” port:21</td>
+    </tr>
+    <tr>
+      <td>webcamXP/webcam7</td>
+      <td>(“webcam 7” OR “webcamXP”) http.component:”mootools” -401</td>
+    </tr>
+    <tr>
+      <td>Etherium Miners</td>
+      <td>“ETH - Total speed”</td>
+    </tr>
+    <tr>
+      <td>Job offers (lol)</td>
+      <td>“X-Recruiting:”</td>
+    </tr>
+    <tr>
+      <td>Chromecasts / Smart TVs</td>
+      <td>“Chromecast:” port:8008</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>When it comes to search results shodan comes out with nice stuff. Shodan will map the results for you, so you’ll see what countries and organizations your results belong to.</p>
+
+<p><img src="https://artikblue.github.io/assets/images/shodan/webcams.JPG" alt="webcams" /></p>
+
+<p>You can easily do a first analysis in the webapp itself.</p>
+
+<p><img src="https://artikblue.github.io/assets/images/shodan/webcamscountries.JPG" alt="webcams" /></p>
+
+<p>And if you click in the hosts, you’ll retrieve more information. You can also open the host in the browser (if it contains a web app):</p>
+
+<p><img src="https://artikblue.github.io/assets/images/shodan/webcamexaple.JPG" alt="webcams" /></p>
+
+<p>The results can be pretty funny. For example, in this case, I looked for the webcamxp software and a bunch of results came out. Well it turns out that the <a href="https://www.exploit-db.com/exploits/18510">webcamxp</a> has a software vulnerability and the same thing happens with a lot of services that you can find in hosts that are acually indexed in shodan…</p>
+<h4 id="the-shodan-api">The shodan api</h4>
+
+<p>The web is OK but if we want to do some more serious stuff we would like to autmate our queries and maybe we would like to auto insert our results to a database/dataset for further analysis. That can be done by using the shodan python api. It can be installed by</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install shodan
+</code></pre></div></div>
+<p>And a hello world query using the api would look like:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import shodan
+
+api_key = "XXX"
+
+api = shodan.Shodan(api_key)
+api.info()
+
+results = api.search('country:US apache')
+print("Results found: {}" . format(results['total']))
+for result in results['matches']:
+    print('IP: {}' . format(result['ip_str']))
+    print(result['data'])
+    print('')
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>artik@blue:~$ python3 sample.py 
+Results found: 8740074
+IP: 146.71.77.80
+HTTP/1.1 200 OK
+Date: Sun, 12 Jan 2020 16:59:05 GMT
+Server: Apache/2.4.41 (cPanel) OpenSSL/1.0.2t mod_bwlimited/1.4
+Transfer-Encoding: chunked
+Content-Type: text/html
+
+
+
+IP: 184.168.244.3
+HTTP/1.1 200 OK
+Date: Sun, 12 Jan 2020 16:59:05 GMT
+Server: Apache
+Last-Modified: Fri, 26 Apr 2013 00:35:46 GMT
+Accept-Ranges: bytes
+Content-Length: 76
+Vary: Accept-Encoding
+Content-Type: text/html
+</code></pre></div></div>
+
+<p>As we see here, we retrieve 8740074 results with this query! By default, the “matches” object is a list that contains the first 100 results, if we want to move to the next page we have to specify page=2 (and so on) in our query: api.search(‘country:US apache’, page = 2). So retrieving information from each page will consume one of our search querries and as you our 100 credits are far from enough for retrieving those 8740074 values. Working on those premises, it is important to say that we need to dimension our queries very well.</p>
+
+<h3 id="intelligence-gathering-and-analysis">Intelligence gathering and analysis</h3>
+
+<h4 id="dimensioning-and-optimizing-our-queries">Dimensioning and optimizing our queries</h4>
+
+<p>Dimensioning our queries well is not an easy thing and sometimes will be impossible (we’ll lose information). There are cases though where a simple query will return less few and interesting analysis (remember, when it comes to analysis, the abscence of a value/result offers information as well).</p>
+
+<p>For example, let us look at this query related to gas pumps:</p>
+
+<p><img src="https://artikblue.github.io/assets/images/shodan/gas_spots.JPG" alt="gas" /></p>
+
+<p>We can see that the query returns few values and we can get them all. And it even returns very nice information such as the gas tank levels of each pump.</p>
+
+<p><img src="https://artikblue.github.io/assets/images/shodan/gaslevels.JPG" alt="gaslevels" /></p>
+
+<p>Those values could help us in the analysis or in the monitorization of a specific technology, it could also help an attacker in conducting sabotage operations against a specific region. But in situations such as that one has to think in perspective, on this case, there are thousands of different gas pumps out there and probably we are receiving a ridiculous part of them on that query.</p>
+
+<h4 id="a-peek-inside-the-dprk-network-range">A peek inside the DPRK network range</h4>
+
+<p>After some research I’ve found the following query in many publications related to the North Korean internet.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>net:175.45.176.0/22,210.52.109.0/24,77.94.35.0/24
+</code></pre></div></div>
+<p>Eventhough after retrieving the results I find a lot of hosts related to Latvia and some actually related to DPRK. After some more research one can find <a href="https://lite.ip2location.com/korea-(democratic-peoples-republic-of)-ip-address-ranges">“the following”</a> network ranges related to DPRK. So one can see that <em>175.45.176.0/22</em> and <em>202.72.96.4/29</em> would perform a more accurate and effective search.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>net:175.45.176.0/22,202.72.96.4/29
+</code></pre></div></div>
+
+<p><img src="https://artikblue.github.io/assets/images/shodan/nk1.JPG" alt="nk1" /></p>
+
+<p>We can also download the shodan data in a json format and save it to a mongodb for further analysis. R may be a good way to do data analysis on that. Here I show some very basic descriptive analysis as an example:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; library(mongolite)
+&gt; library(plyr)
+&gt; library(dplyr)
+&gt; library(ggplot2)
+&gt; con &lt;- mongo("net", url = "mongodb://127.0.0.1:27017/nk")
+&gt; mydata &lt;- con$find('{"location.country_code": "KP"}')
+&gt; unique(mydata["asn"])
+       asn
+1 AS131279
+&gt; unique(mydata["org"])
+            org
+1 Ryugyong-dong
+&gt; unique(mydata["isp"])
+            isp
+1 Ryugyong-dong
+&gt; unique(mydata["port"])
+   port
+1   443
+2  8080
+3    80
+6    53
+9    25
+12   21
+19   22
+23  587
+29   23
+&gt; port &lt;- mydata %&gt;% group_by(port)
+&gt; count(port)
+# A tibble: 9 x 2
+# Groups:   port [9]
+  port      n
+  &lt;chr&gt; &lt;int&gt;
+1 21        2
+2 22        1
+3 23        1
+4 25        4
+5 443       2
+6 53        3
+7 587       1
+8 80        2
+9 8080     18
+&gt; unique(mydata["product"])
+                     product
+1        Microsoft IIS httpd
+2                       &lt;NA&gt;
+9                   Sendmail
+21              Apache httpd
+22             Postfix smtpd
+24 Cisco PIX sanitized smtpd
+29      Cisco router telnetd
+&gt; product &lt;- mydata %&gt;% group_by(product)
+&gt; count(product)
+# A tibble: 7 x 2
+# Groups:   product [7]
+  product                       n
+  &lt;chr&gt;                     &lt;int&gt;
+1 Apache httpd                  2
+2 Cisco PIX sanitized smtpd     1
+3 Cisco router telnetd          1
+4 Microsoft IIS httpd           2
+5 Postfix smtpd                 2
+6 Sendmail                      2
+7 NA                           24
+&gt; unique(mydata["devicetype"])
+   devicetype
+1        &lt;NA&gt;
+24   firewall
+29     router
+&gt; devicetype &lt;- mydata %&gt;% group_by(devicetype)
+&gt; count(devicetype)
+# A tibble: 3 x 2
+# Groups:   devicetype [3]
+  devicetype     n
+  &lt;chr&gt;      &lt;int&gt;
+1 firewall       1
+2 router         1
+3 NA            32
+&gt; 
+</code></pre></div></div>
+<p>As we can see from here and taking the data we got from the map into account as well. We can theorize that most of the DPRK net infrastructure is private and hidden inside the country, though some external communications are needed for the country. According to the map, those hosts are located within the <em>Potonggang-guyok</em> area, an area that hosts one of the DPRKs strategic headquarters. Most of the devices, almost each of them are network equipment such as mail and web servers. Some routers/firewall appear as well, there is a chance that some of those are routing some internal traffic outside the country.</p>
+<h4 id="iran-nuclear-reactors-in-the-spotlight">Iran nuclear reactors in the spotlight</h4>
+<p>Another interesting case of studio is using shodan to detect device activity near critical infrastructures such as power plants. Iran has been very relevant in the international geo political scenario, so let’s try to peek there.</p>
+
+<p>In this case, the <em>geo</em> filter comes very handy. As facilities such as nuclear reactors are not very often located in the middle of a city, in scenarios such as these we’ll have to do our side research, identify reasonable coordinates/geo areas and aim there. I’ve built a python dictionary with the following:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nuclear_reactors = {
+    'lavizan':'geo:35.773056, 51.497778, 80',
+    'natanz':'geo:33.723453, 51.727097, 80',
+    'parchin':'geo:35.52, 51.77, 80',
+    'saghand':'geo:32.313, 55.53, 80',
+    'tehran':'geo:35.738333, 51.388056, 80'
+}
+</code></pre></div></div>
+
+<p>We can automate the search using the api and index the results in mongo:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import shodan
+import pymongo
+api_key = "xXxXx"
+
+api = shodan.Shodan(api_key)
+api.info()
+
+myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+mydb = myclient["iran"]
+
+
+nuclear_reactors = {
+    'lavizan':'geo:35.773056, 51.497778, 80',
+    'natanz':'geo:33.723453, 51.727097, 80',
+    'parchin':'geo:35.52, 51.77, 80',
+    'saghand':'geo:32.313, 55.53, 80',
+    'tehran':'geo:35.738333, 51.388056, 80'
+}
+
+for n in nuclear_reactors.keys():
+    print(nuclear_reactors[n])
+    col = mydb[n]
+    results = api.search(nuclear_reactors[n])
+    print("Results found: {}" . format(results['total']))
+
+    for r in results["matches"]:
+        x = col.insert_one(r)
+        print(x)
+</code></pre></div></div>
+<p>And then we can run some analyses on the data. This analyses showed relevant device activity near lavizan and parchin facilities. Parchin is specially interesting because is one of the main facilities related to Irans military nuclear program.</p>
+<h4 id="maping-the-ucranian-industrial-sector">Maping the ucranian industrial sector</h4>
+<p>Finally this last use-case scenario involves the power of shodan as an auxiliary tool to map the industrialization of a country. By shodan we can look for ICS devices (industrial control systems). ICSs are very rarely found in networks/facilities that are not related to industries (or are industries themselves). So, searching for those may reveal the location of large industrial areas. Industrial systems often relate to critical infrastructures. In this example I’m detecting industrial infrastructures in Ucrania. I’ve chose Ucrania because it suffered from blackouts related to cyberattacks recently (or thats what some people say).</p>
+
+<p>The queries I’ve used to map the ICS devices were these:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>System</th>
+      <th>Query</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MODBUS ICS</td>
+      <td>port:502</td>
+    </tr>
+    <tr>
+      <td>SIEMENS S7</td>
+      <td>port:102</td>
+    </tr>
+    <tr>
+      <td>DNP3</td>
+      <td>port:20000 source address</td>
+    </tr>
+    <tr>
+      <td>TRIDIUM FOX PROTOCOL</td>
+      <td>port:1911,4911 product:Niagara</td>
+    </tr>
+    <tr>
+      <td>BACNET</td>
+      <td>port:47808</td>
+    </tr>
+    <tr>
+      <td>Ethernet/IP</td>
+      <td>port:44818</td>
+    </tr>
+    <tr>
+      <td>GR-SRTP</td>
+      <td>port:18245,18246 product:”general electric”</td>
+    </tr>
+    <tr>
+      <td>HART-IP</td>
+      <td>port:5094 hart-ip</td>
+    </tr>
+    <tr>
+      <td>PCWORX PLC</td>
+      <td>port:1962 PLC</td>
+    </tr>
+    <tr>
+      <td>MELSEC-Q</td>
+      <td>port:5006,5007 product:mitsubishi</td>
+    </tr>
+    <tr>
+      <td>OMRON</td>
+      <td>port:9600 response code</td>
+    </tr>
+    <tr>
+      <td>REDLION</td>
+      <td>port:789 product:”Red Lion Controls”</td>
+    </tr>
+    <tr>
+      <td>CODESYS</td>
+      <td>port:2455 operating system</td>
+    </tr>
+    <tr>
+      <td>IEC 60870 SCADA</td>
+      <td>port:2404 asdu address</td>
+    </tr>
+    <tr>
+      <td>ProConOS</td>
+      <td>port:20547 PLC</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>And one mega query would look like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>country:IR (port:502 OR port:102 OR port:20000 source address OR port:1911,4911 product:Niagara OR port:47808 OR port:44818 OR port:18245,18246 product:"general electric" OR port:5094 hart-ip OR  port:1962 PLC OR port:5006,5007 product:mitsubishi OR port:9600 response code  OR port:789 product:"Red Lion Controls" OR port:2455 operating system OR port:2404 asdu address OR port:20547 PLC) 
+</code></pre></div></div>
+
+<p>After an initial analysis of the data we can realise that “moodbus” is the protocol were most of the systems belong to. So taking that into account, we can infere a couple of things:</p>
+
+<ol>
+  <li>In areas/systems were “modbus” is present we’ll probably find other ICS systems of different kind.</li>
+  <li>Orgs containing “modbus” systems will probably industrial organizations.</li>
+</ol>
+
+<p>Said that, we can conclude that “modbus” may be a good indicator. So we can use the shodan map with that:</p>
+
+<p><img src="https://artikblue.github.io/assets/images/shodan/ua_ics.JPG" alt="modbus" /></p>
+
+<p>As we can see traditional industrial Ucranian regions such as Kyiv or the Donbass stand out from the rest thus we can see that the map is not far from reality and can be considered. Eventhoug this is a very simplistic example, more comprobations should be made as it is possible, for example, to have more industrialized regions that use a different technology or a technology that is heavily secured (or not even connected to the internet). What is true is that the regions shown in the map contain industrial systems and thus contain industries.</p>
+
+<p>I will update this post with relevant information as soon as I make more time. That said, I want to state that I do not have anything against the countries studied on this post, sure they are full of charming people as any other nation in the world.</p>
+
+<p>Be good!</p>
+
+            </div>
+            <footer class="post-footer">
+                
+                <p class="post-tags">
+                     
+                    <a href='https://artik.blue/tag/shodan/'>shodan</a>
+                    
+                     
+                    <a href='https://artik.blue/tag/python/'>python</a>
+                    
+                     
+                    <a href='https://artik.blue/tag/analysis/'>analysis</a>
+                    
+                    
+                </p>
+                
+                <div class="post-share">
+                    <span class="post-share-title">Share:</span>
+                    <a target="_blank" href="https://twitter.com/share?text=Generating+contextual+geographic+intelligence+with+shodan&amp;url=https://artik.blue/shodan-intelligence-1">Twitter</a>
+                    <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://artik.blue/shodan-intelligence-1">Facebook</a>
+                </div><!-- .share-post -->
+            </footer>
+            <div class="author-box">
+                <div class="author-avatar"><img src="assets/images/avatar.png" alt="Artikblue's Picture"
+                        class="avatar"></div>
+                <div class="author-details">
+                    <h2 class="author-title">About Artikblue</h2>
+                    <p class="author-description"></p>
+                </div>
+            </div>
+            
+<section id="comments-area" class="comments-area">
+    <h2 class="comments-title">Comments</h2>
+    <div class="comments-inside">
+        <div id="disqus_thread"></div>
+    </div><!-- .comments-inside -->
+    <div id="comments-overlay" class="comments-overlay">
+        <a href="shodan-intelligence-1.html#" id="comments-show" class="comments-show">Show comments</a>
+    </div><!-- .comments-overlay -->
+    <script type="text/javascript">
+        var disqus_shortname = 'artikblue';
+        var disqus_developer = 0;
+        (function () {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+        </article>
+        
+        <section class="read-next inner">
+            <h2 class="read-next-title">Read Next</h2>
+            
+            <article class="post">
+                <header class="post-header">
+                    <div class="post-meta">
+                        <time class="published" datetime="June 4, 2020">June 4, 2020</time>
+                    </div>
+                    <h3 class="post-title"><a href="reversing-radare-16.html">Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)</a></h3>
+                    <p class="post-tags">
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/reversing/'>Reversing</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/c/'>C</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/radare/'>Radare</a>
+                        
+                        
+                        
+                    </p>
+                </header>
+                
+                <a href="reversing-radare-16.html" class="post-thumbnail">
+                    <img src="assets/images/radare2/radare2_17.png" alt="Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)" />
+                </a>
+                
+            </article>
+            
+            
+        </section><!-- .read-next -->
+    </main><!-- .site-main -->
+</div><!-- .site-content -->
+
+        
+
+        
+
+        <footer id="colophon" class="site-footer outer">
+            <div class="site-footer-inside">
+                <p class="social-links">
+    
+    <a href="https://twitter.com/artikblue" target="_blank">
+        <span class="fa-twitter fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">Twitter</span>
+    </a>
+    
+    
+    
+    <a href="https://github.com/artikblue" target="_blank">
+        <span class="fa-github fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">GitHub</span>
+    </a>
+    
+    
+    
+    
+    <a href="https://medium.com/@artikblue" target="_blank">
+        <span class="fa-medium fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">medium</span>
+    </a>
+    
+    
+    
+    
+    
+</p>
+                <p class="site-info">
+                    <a href="shodan-intelligence-1.html#">Artik blue</a> &copy; 2020 . Horace theme by
+                    <a target="_blank" href="https://justgoodthemes.com/">JustGoodThemes</a>. <br />
+                    Powered by <a target="_blank" href="https://jekyllrb.com/">Jekyll</a>.
+                </p>
+                <p class="back-to-top">
+                    <a id="top-button" class="top-button" href="shodan-intelligence-1.html#page">
+                        <span class="icon-arrow-up" aria-hidden="true"></span>
+                        <span class="screen-reader-text">Back to top</span>
+                    </a>
+                </p>
+            </div><!-- .site-footer-inside -->
+        </footer><!-- .site-footer -->
+    </div><!-- .site -->
+    <div id="site-overlay" class="site-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+	<div class="sidebar-scrollable">
+		<div class="sidebar-inside">
+			<button id="sidebar-hide" class="sidebar-toggle"><span class="screen-reader-text">Close Sidebar</span><span
+				    aria-hidden="true" class="icon-close"></span></button>
+			<nav id="sidebar-navigation" class="widget site-navigation">
+				<h2 class="widget-title">Explore Site</h2>
+				<ul class="menu">
+					
+						<li class="menu-item"><a href="about.html">About</a></li>
+					
+						<li class="menu-item"><a href="reversing.html">Reversing</a></li>
+					
+				</ul>
+			</nav>
+			
+<section class="widget widget-text">
+    <h2 class="widget-title">About Artik blue</h2>
+    <p>Alternate use of modern technology also known as hacking.</p>
+</section>
+
+
+<section class="widget widget-recent-posts">
+    <h2 class="widget-title">Recent Articles</h2>
+    <ul>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">December 1, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="shodan-intelligence-1.html">Generating contextual geographic intelligence with shodan</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="shodan-intelligence-1.html">
+                <img src="assets/images/shodan.png"
+                    alt="Generating contextual geographic intelligence with shodan">
+            </a>
+            
+        </li>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">June 4, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="reversing-radare-16.html">Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="reversing-radare-16.html">
+                <img src="assets/images/radare2/radare2_17.png"
+                    alt="Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)">
+            </a>
+            
+        </li>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">June 3, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="opsec-2.html">Operational security techniques in asymmetric conflicts - II (device acquisitions)</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="opsec-2.html">
+                <img src="assets/images/opsec/opsec2.png"
+                    alt="Operational security techniques in asymmetric conflicts - II (device acquisitions)">
+            </a>
+            
+        </li>
+        
+    </ul>
+</section>
+
+<!-- Create a sorted array of tags -->
+ 
+<section class="widget widget-tagcloud">
+    <h2 class="widget-title">Tags</h2>
+    <div class="tagcloud">
+        
+        <a href='https://artik.blue/tag/analysis/'>analysis</a>
+        
+        <a href='https://artik.blue/tag/anonymous/'>anonymous</a>
+        
+        <a href='https://artik.blue/tag/apis/'>apis</a>
+        
+        <a href='https://artik.blue/tag/arduino/'>arduino</a>
+        
+        <a href='https://artik.blue/tag/asm/'>asm</a>
+        
+        <a href='https://artik.blue/tag/asyncio/'>asyncio</a>
+        
+        <a href='https://artik.blue/tag/atmel/'>atmel</a>
+        
+        <a href='https://artik.blue/tag/c/'>c</a>
+        
+        <a href='https://artik.blue/tag/communities/'>communities</a>
+        
+        <a href='https://artik.blue/tag/hacktivism/'>hacktivism</a>
+        
+        <a href='https://artik.blue/tag/hacktivists/'>hacktivists</a>
+        
+        <a href='https://artik.blue/tag/linux/'>linux</a>
+        
+        <a href='https://artik.blue/tag/opsec/'>opsec</a>
+        
+        <a href='https://artik.blue/tag/processing/'>processing</a>
+        
+        <a href='https://artik.blue/tag/python/'>python</a>
+        
+        <a href='https://artik.blue/tag/r/'>r</a>
+        
+        <a href='https://artik.blue/tag/radare/'>radare</a>
+        
+        <a href='https://artik.blue/tag/relay/'>relay</a>
+        
+        <a href='https://artik.blue/tag/reversing/'>reversing</a>
+        
+        <a href='https://artik.blue/tag/shellcode/'>shellcode</a>
+        
+        <a href='https://artik.blue/tag/shodan/'>shodan</a>
+        
+    </div>
+</section>
+
+
+		</div><!-- .sidebar-inside -->
+	</div><!-- .sidebar-scrollable -->
+</aside><!-- .sidebar -->
+    
+  <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '', { 'anonymize_ip': true });
+  </script>
+
+    <!-- Javascript Assets -->
+    <script src="assets/js/jquery-3.3.1.min.js"></script>
+    <script src="assets/js/plugins.js"></script>
+    <script src="assets/js/custom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+
+</html>

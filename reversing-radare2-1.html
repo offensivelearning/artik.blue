@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+        <title>Reverse engineering 32 and 64 bits binaries with Radare2 - 1</title>
+        <meta name="description" content="About this course This series of post that I’m starting with this one will cover the fundamentals of reverse engineering with the “popular” radare2 framework...">
+        <link rel="canonical" href="reversing-radare2-1.html">
+    
+
+    <!-- Site Favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/png" />
+
+    <!-- Font Embed Code -->
+    <link href="https://fonts.googleapis.com/css?family=Karla:400,400i,700,700i" rel="stylesheet" />
+
+    <!-- CSS Styles -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/light.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+    
+
+</head>
+
+
+
+<body class="layout-post">
+    <div id="page" class="site">
+
+        
+        <header id="masthead" class="site-header outer">
+    <div class="site-header-inside">
+        <div class="site-branding">
+            
+                <p class="site-logo"><a href="index.html" rel="home"><img src="assets/images/logo.png" alt="Artik blue" /></a></p>
+                <h1 class="site-title screen-reader-text"><a href="reversing-radare2-1.html" rel="home">Artik blue digital thoughts</a></h1>
+            
+        </div><!-- .site-branding -->
+        <nav id="main-navigation" class="site-navigation" aria-label="Primary Navigation">
+            <ul class="menu">
+            
+                <li class="menu-item"><a href="about.html">About</a></li>
+            
+                <li class="menu-item"><a href="reversing.html">Reversing</a></li>
+            
+            </ul>
+            <button id="sidebar-show" class="sidebar-toggle"><span class="screen-reader-text">Open Sidebar</span><span class="icon-more" aria-hidden="true"></span></button>
+        </nav><!-- .site-navigation -->
+    </div><!-- .site-header-inside -->
+</header><!-- .site-header -->
+        
+
+        <div id="content" class="site-content fadeInDown delay_075s">
+    <main id="main" class="site-main outer">
+        <article class="post-full inner">
+            <header class="post-header">
+                <div class="post-meta">
+                    <time class="post-date" datetime="2020-01-13">January 13,
+                        2020</time>
+                </div><!-- .post-meta -->
+                <h1 class="posttitle">Reverse engineering 32 and 64 bits binaries with Radare2 - 1</h1>
+            </header><!-- .post-header -->
+            
+            <div class="post-thumbnail"><img class="featured-image img-fluid" src="assets/images/radare2/radare2_1.png"
+                    alt="Reverse engineering 32 and 64 bits binaries with Radare2 - 1"></div>
+            
+            <div class="post-content">
+                <h4 id="about-this-course">About this course</h4>
+<p>This series of post that I’m starting with this one will cover the fundamentals of reverse engineering with the “popular” radare2 framework. What I want to do here is to walk you through a diverse set of examples of C-written binaries that will cover the most common algorithms and data structures you can find in programs out there, so at the end you will be able to identify them and work with them. This won’t be an advanced/pro course but it will start from the very bottom and will cover far more than the average free course/tutorial.</p>
+
+<p>On these series of posts we’ll start with an C source file / algorithm, compile it in both 32 bits and 64 bits systems and then reverse engineer it using radare2, so you’ll be able to appreciate the differences between 32 and 64 bit binaries. Once we cover the fundamentals of reversing we’ll focus on x64.</p>
+
+<p>I assume that you have some fundamental knowledge about computer arquitectures and know some basic asm instructions such as mov, push and such. I also assume that you already know what radare2 is and thus want to <em>finally</em> learn how to use it.</p>
+
+<p><a href="https://artik.blue/www.twitter.com/artikblue">Wanna show your support to this course? Follow me in Twitter! @artikblue</a> If people show interest I’ll post more content :)</p>
+<h4 id="getting-radare2">Getting radare2</h4>
+
+<p>Most of the people who use radare2 use it on Linux systems, as from there you can analyze all sorts of binaries and if you want to debug them you can connect to a remote debug session or use gbd on Linux. In here we’ll use r2 on Linux most of the time and move it to Windows when needed.</p>
+
+<p>Radare2 supports a ton of arquitectures from from x64 to arduinos or tamagochis and you can analyze binaries related to those arquitectures from the comfort of your ubuntu system or whatever you use.</p>
+
+<p>Said that, the best way to get radare2, as the webpage itself suggests is to clone it from the repositories:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/radare/radare2
+cd radare2
+sys/install.sh   # just run this script to update r2 from git
+</code></pre></div></div>
+<p>You can also install it from the apt/rpm/yaourt/whatever repo in most distributions with something like:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt-get install radare2
+</code></pre></div></div>
+
+<p>And if you wish to use it on windows you can <a href="https://rada.re/r/down.html">download the windows setup</a> from its website.</p>
+
+<h4 id="hello-world">Hello world</h4>
+<p>Every programming journy begins with the classical hello world program and this one won’t be less. And a hello world in C language will look exactly like that:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+#include &lt;stdio.h&gt;
+int main() {
+   printf("Hello, World!");
+   return 0;
+}
+</code></pre></div></div>
+
+<p>A program like that can be easily compiled using the GCC compiler like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gcc -w hello_world.c -o hello_word
+</code></pre></div></div>
+<p>And if we run it we are basically going to get a “Hello, World!” on our screen and that will be all, very simple but we need to begin with something :)</p>
+
+<p>Once the program is compiled we can open it with r2 by using “radare2 program” where program is the program you want to analyze, r2 is also an alias of radare2 so you can use it instead if you want. Once the binary is loaded, we need radare to parse the program; running aaaa will analize the binary and detect data structures, functions calls and these kinds of elements. If you want to better understand how this works <a href="https://reverseengineering.stackexchange.com/questions/19895/radares-aaaa-and-aa-what-does-it-do-exactly">this answer on stackoverflow</a> is quite explainatory.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lab@lab-VirtualBox:~$ radare2 c_examples/bin/hello_world 
+ -- Use V! to enter into the visual panels mode (dwm style)
+[0x08048310]&gt; aaaa
+[Cannot analyze at 0x08048300g with sym. and entry0 (aa)
+[x] Analyze all flags starting with sym. and entry0 (aa)
+[Cannot analyze at 0x08048300ac)
+[x] Analyze function calls (aac)
+[x] Analyze len bytes of instructions for references (aar)
+[x] Check for objc references
+[x] Check for vtables
+[x] Type matching analysis for all functions (aaft)
+[x] Propagate noreturn information
+[x] Use -AA or aaaa to perform additional experimental analysis.
+[x] Finding function preludes
+[x] Enable constraint types analysis for variables
+[0x08048310]&gt; 
+</code></pre></div></div>
+<p>Once the program is loaded and parsed, plenty of actions can be done on it, such as listing strings, disassembling code blocks and more. One of the most common things you’ll want to do when you get your hands on an unknown binary is to get a list of its functions. You can do it using the afl command.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0x08048310]&gt; afl
+0x08048310    1 33           entry0
+0x080482f0    1 6            sym.imp.__libc_start_main
+0x08048350    4 43           sym.deregister_tm_clones
+0x08048380    4 53           sym.register_tm_clones
+0x080483c0    3 30           entry.fini0
+0x080483e0    4 43   -&gt; 40   entry.init0
+0x080484a0    1 2            sym.__libc_csu_fini
+0x08048340    1 4            sym.__x86.get_pc_thunk.bx
+0x080484a4    1 20           sym._fini
+0x08048440    4 93           sym.__libc_csu_init
+0x0804840b    1 46           main
+0x080482e0    1 6            sym.imp.printf
+0x080482ac    3 35           sym._init
+[0x08048310]&gt; 
+</code></pre></div></div>
+<p>In examples such as this one, the most interesting function is “main”. Entry* functions can be interesting as well but as this is a hello world program in functions like those you’ll probably find a bunch of code you won’t understand at all at this moment (some internal stuff added by the compiler) so we can leave them for now. Other functions we are seeing in this example are related to the C libraries/calls used by the progam (as the printf call you’ll probably identify there).</p>
+
+<p>Another interesting initial thing we can do here is for example get the general information about the binary with <em>iI</em>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0x08048310]&gt; iI
+arch     x86
+baddr    0x8048000
+binsz    6115
+bintype  elf
+bits     32
+canary   false
+class    ELF32
+compiler GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.12) 5.4.0 20160609
+crypto   false
+endian   little
+havecode true
+intrp    /lib/ld-linux.so.2
+laddr    0x0
+lang     c
+linenum  true
+lsyms    true
+machine  Intel 80386
+maxopsz  16
+minopsz  1
+nx       true
+os       linux
+pcalign  0
+pic      false
+relocs   true
+relro    partial
+rpath    NONE
+sanitiz  false
+static   false
+stripped false
+subsys   linux
+va       true
+
+[0x08048310]&gt; 
+</code></pre></div></div>
+<p>That will prompt values such as the architecture or the compiler. Those values are always interesting so we can know what we are dealing with and start discarting strategies focusing on what matters.</p>
+
+<p>We can also list the imports with <em>ii</em></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0x08048310]&gt; ii
+[Imports]
+nth                vaddr              bind   type              name
+―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+577730550794551297 0xb6f9994600000000 FUNC   printf            
+2                  0xb6f9994d00000000 NOTYPE __gmon_start__    
+577730619514028035 0xb6f9994600000000 FUNC   __libc_start_main 
+</code></pre></div></div>
+<p>In this particular case, by know we should be sure that we are dealing with a simple program written in C.</p>
+
+<p>Another command of our interest may be the <em>iz</em> one. That will list all of the strings contained within the data section of the program (<em>izz</em> will list strings in the whole file). That command is specially useful when dealing with simple crackmes (so we can identify hardcoded passwords).</p>
+
+<p>In general terms knowing the strings inside a program is helpful when it comes to getting a general idea of “what the program is about”.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0x08048310]&gt; iz
+[Strings]
+nth           paddr             vaddr       len size     section type          string
+―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+5222680231936 0x80484c000000000 0xd00000000 14  34461128 ascii   Hello, World! bin.strings
+
+[0x08048310]&gt; 
+</code></pre></div></div>
+<p>As we can see, iz detects the “Hello, World!” string, the string that appears everytime we run the program. Radare also tells us about the section (ascii) and the location of the string.</p>
+
+<p>Now that we know some of the very basic fundamentals let’s actually reverse the program and try to figure out what and how it does.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0x08048310]&gt; sf main
+[0x0804840b]&gt; pdb
+            ; DATA XREF from entry0 @ 0x8048327
+┌ 46: int main (int32_t arg_4h, char **argv, char **envp);
+│           ; var int32_t var_4h @ ebp-0x4
+│           ; arg int32_t arg_4h @ esp+0x24
+│           0x0804840b      8d4c2404       lea ecx, [arg_4h]
+│           0x0804840f      83e4f0         and esp, 0xfffffff0
+│           0x08048412      ff71fc         push dword [ecx - 4]
+│           0x08048415      55             push ebp
+│           0x08048416      89e5           mov ebp, esp
+│           0x08048418      51             push ecx
+│           0x08048419      83ec04         sub esp, 4
+│           0x0804841c      83ec0c         sub esp, 0xc
+│           0x0804841f      68c0840408     push str.Hello__World       ; 0x80484c0 ; "Hello, World!" ; const char *format
+│           0x08048424      e8b7feffff     call sym.imp.printf         ; int printf(const char *format)
+│           0x08048429      83c410         add esp, 0x10
+│           0x0804842c      b800000000     mov eax, 0
+│           0x08048431      8b4dfc         mov ecx, dword [var_4h]
+│           0x08048434      c9             leave
+│           0x08048435      8d61fc         lea esp, [ecx - 4]
+└           0x08048438      c3             ret
+[0x0804840b]&gt; 
+</code></pre></div></div>
+<p>The first thing that we have to understand here is that, we are inspecting main, and main is a function, so it has to return to somewhere and it may receive arguments or need space for local variables, operations related to those aspects are performed at the beggining and the end of the code.</p>
+
+<p>The part that we’ll have to focus on here starts with push str.Hello__World and then the call to printf. In 32 bits systems the way of passing parameters to functions consists of pushing those parameters to the stack and then executing a call operation on the address of the function. So something like “printf(a);” in C would be a “push a; call printf” in asm. <a href="https://stackoverflow.com/questions/36046201/why-do-we-push-ebp-and-mov-ebp-esp-in-the-callee-in-assembly">So what about the rest of the code?</a> Well, the first part of the code is related establishing a new <a href="http://www.cs.uwm.edu/classes/cs315/Bacon/Lecture/HTML/ch10s07.html">stack frame</a> and a stack frame is nothing more than a section of the code that will contain local variables of the function, arguments passed and values such as that. The end of the code</p>
+
+<h4 id="x64-binaries-and-its-particularities">x64 binaries and its particularities</h4>
+<p>Let’s repeat the process now but compiling the same program and opening it in r2 in an x64 system.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0x00000540]&gt; sf sym.main
+[0x0000064a]&gt; pdb
+            ;-- main:
+/ (fcn) sym.main 28
+|   sym.main ();
+|              ; DATA XREF from 0x0000055d (entry0)
+|           0x0000064a      55             push rbp
+|           0x0000064b      4889e5         mov rbp, rsp
+|           0x0000064e      488d3d9f0000.  lea rdi, qword str.Hello__World ; 0x6f4 ; "Hello, World!" ; const char * format
+|           0x00000655      b800000000     mov eax, 0
+|           0x0000065a      e8c1feffff     call sym.imp.printf         ; int printf(const char *format)
+|           0x0000065f      b800000000     mov eax, 0
+|           0x00000664      5d             pop rbp
+\           0x00000665      c3             ret
+[0x0000064a]&gt; 
+</code></pre></div></div>
+<p>The main difference between a x32 program and a x64 one in small examples like this one is that, as you may have seen parameters to functions aren’t passed by the stack. In x64 programs like this one, parameters are passed using registers such as rdi, rsi, rdx, rcx, r8 and r9 in that order. We’ll keep walking through the x64 architecture with clear and specific examples but <a href="https://cs.brown.edu/courses/cs033/docs/guides/x64_cheatsheet.pdf">you may want to consider reading a cheatsheet like this one to gain a more solider understanding on topics such as this last one</a></p>
+
+<p>There is nothing much more to comment by now.</p>
+
+<p>If we look at the code, in this case, at the beggining of the code, we can appreciate a “push rbp, mov ebp, rsp” This is related to the stack alignment. Then what comes next is way more clear, with lea we load the effective address of the null terminated string “Hello, World!” to the RDI register, then we load the hex value 0 to eax and we proceed to call printf(). We load eax with 0 mainly because the printf function has variable arguments such as the string and a whole lot of format related parameters among others, printf can work with vector registers, for example when doing printf(“%f”, 1.0f) then the progam will have to set eax to 1 to indicate that. <a href="https://stackoverflow.com/questions/6212665/why-is-eax-zeroed-before-a-call-to-printf">This stackoverflow question offers a very clear explanation on the mov eax,0 issue</a></p>
+
+<p>At the end of the program, we see a mov eax, 0 then pop rbp and a ret being executed. The first the the first one seats eax to 0 as it gets the program ready to do a “return 0” then the second one restores the stack to its original state via picking the original stack frame value to rbp. Then ret just returns the function exiting it with 0 value.</p>
+
+<h4 id="commands-used">Commands used</h4>
+<p>Today we basically used those commands:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>aaaa</td>
+      <td>Fully analyze the binary</td>
+    </tr>
+    <tr>
+      <td>afl</td>
+      <td>List all the functions in the binary</td>
+    </tr>
+    <tr>
+      <td>ii</td>
+      <td>List imports</td>
+    </tr>
+    <tr>
+      <td>iI</td>
+      <td>Information about the binary</td>
+    </tr>
+    <tr>
+      <td>iz</td>
+      <td>List strings in the binary</td>
+    </tr>
+    <tr>
+      <td>sf   function</td>
+      <td>Seek to a function</td>
+    </tr>
+    <tr>
+      <td>pdb</td>
+      <td>Print disassembly of the basic block</td>
+    </tr>
+  </tbody>
+</table>
+
+
+            </div>
+            <footer class="post-footer">
+                
+                <p class="post-tags">
+                     
+                    <a href='https://artik.blue/tag/reversing/'>reversing</a>
+                    
+                     
+                    <a href='https://artik.blue/tag/c/'>c</a>
+                    
+                     
+                    <a href='https://artik.blue/tag/radare/'>radare</a>
+                    
+                    
+                </p>
+                
+                <div class="post-share">
+                    <span class="post-share-title">Share:</span>
+                    <a target="_blank" href="https://twitter.com/share?text=Reverse+engineering+32+and+64+bits+binaries+with+Radare2+-+1&amp;url=https://artik.blue/reversing-radare2-1">Twitter</a>
+                    <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://artik.blue/reversing-radare2-1">Facebook</a>
+                </div><!-- .share-post -->
+            </footer>
+            <div class="author-box">
+                <div class="author-avatar"><img src="assets/images/avatar.png" alt="Artikblue's Picture"
+                        class="avatar"></div>
+                <div class="author-details">
+                    <h2 class="author-title">About Artikblue</h2>
+                    <p class="author-description"></p>
+                </div>
+            </div>
+            
+<section id="comments-area" class="comments-area">
+    <h2 class="comments-title">Comments</h2>
+    <div class="comments-inside">
+        <div id="disqus_thread"></div>
+    </div><!-- .comments-inside -->
+    <div id="comments-overlay" class="comments-overlay">
+        <a href="reversing-radare2-1.html#" id="comments-show" class="comments-show">Show comments</a>
+    </div><!-- .comments-overlay -->
+    <script type="text/javascript">
+        var disqus_shortname = 'artikblue';
+        var disqus_developer = 0;
+        (function () {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+        </article>
+        
+        <section class="read-next inner">
+            <h2 class="read-next-title">Read Next</h2>
+            
+            <article class="post">
+                <header class="post-header">
+                    <div class="post-meta">
+                        <time class="published" datetime="January 11, 2020">January 11, 2020</time>
+                    </div>
+                    <h3 class="post-title"><a href="https://artik.blue/arduino-embedded-4">Embedded systems programming with atmel328 - 4 (temperature&humidity)</a></h3>
+                    <p class="post-tags">
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/arduino/'>Arduino</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/atmel/'>Atmel</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/processing/'>Processing</a>
+                        
+                        
+                        
+                    </p>
+                </header>
+                
+                <a href="https://artik.blue/arduino-embedded-4" class="post-thumbnail">
+                    <img src="assets/images/arduino/pdht.jpg" alt="Embedded systems programming with atmel328 - 4 (temperature&humidity)" />
+                </a>
+                
+            </article>
+            
+            
+            <article class="post">
+                <header class="post-header">
+                    <div class="post-meta">
+                        <time class="published" datetime="January 14, 2020">January 14, 2020</time>
+                    </div>
+                    <h3 class="post-title"><a href="https://artik.blue/arduino-embedded-5">Embedded systems programming with atmel328 - 5</a></h3>
+                    <p class="post-tags">
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/arduino/'>Arduino</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/atmel/'>Atmel</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/processing/'>Processing</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/relay/'>Relay</a>
+                        
+                        
+                        
+                    </p>
+                </header>
+                
+                <a href="https://artik.blue/arduino-embedded-5" class="post-thumbnail">
+                    <img src="assets/images/arduino/relayheader.jpg" alt="Embedded systems programming with atmel328 - 5" />
+                </a>
+                
+            </article>
+            
+        </section><!-- .read-next -->
+    </main><!-- .site-main -->
+</div><!-- .site-content -->
+
+        
+
+        
+
+        <footer id="colophon" class="site-footer outer">
+            <div class="site-footer-inside">
+                <p class="social-links">
+    
+    <a href="https://twitter.com/artikblue" target="_blank">
+        <span class="fa-twitter fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">Twitter</span>
+    </a>
+    
+    
+    
+    <a href="https://github.com/artikblue" target="_blank">
+        <span class="fa-github fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">GitHub</span>
+    </a>
+    
+    
+    
+    
+    <a href="https://medium.com/@artikblue" target="_blank">
+        <span class="fa-medium fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">medium</span>
+    </a>
+    
+    
+    
+    
+    
+</p>
+                <p class="site-info">
+                    <a href="reversing-radare2-1.html#">Artik blue</a> &copy; 2020 . Horace theme by
+                    <a target="_blank" href="https://justgoodthemes.com/">JustGoodThemes</a>. <br />
+                    Powered by <a target="_blank" href="https://jekyllrb.com/">Jekyll</a>.
+                </p>
+                <p class="back-to-top">
+                    <a id="top-button" class="top-button" href="reversing-radare2-1.html#page">
+                        <span class="icon-arrow-up" aria-hidden="true"></span>
+                        <span class="screen-reader-text">Back to top</span>
+                    </a>
+                </p>
+            </div><!-- .site-footer-inside -->
+        </footer><!-- .site-footer -->
+    </div><!-- .site -->
+    <div id="site-overlay" class="site-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+	<div class="sidebar-scrollable">
+		<div class="sidebar-inside">
+			<button id="sidebar-hide" class="sidebar-toggle"><span class="screen-reader-text">Close Sidebar</span><span
+				    aria-hidden="true" class="icon-close"></span></button>
+			<nav id="sidebar-navigation" class="widget site-navigation">
+				<h2 class="widget-title">Explore Site</h2>
+				<ul class="menu">
+					
+						<li class="menu-item"><a href="about.html">About</a></li>
+					
+						<li class="menu-item"><a href="reversing.html">Reversing</a></li>
+					
+				</ul>
+			</nav>
+			
+<section class="widget widget-text">
+    <h2 class="widget-title">About Artik blue</h2>
+    <p>Alternate use of modern technology also known as hacking.</p>
+</section>
+
+
+<section class="widget widget-recent-posts">
+    <h2 class="widget-title">Recent Articles</h2>
+    <ul>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">December 1, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="shodan-intelligence-1.html">Generating contextual geographic intelligence with shodan</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="shodan-intelligence-1.html">
+                <img src="assets/images/shodan.png"
+                    alt="Generating contextual geographic intelligence with shodan">
+            </a>
+            
+        </li>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">June 4, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="reversing-radare-16.html">Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="reversing-radare-16.html">
+                <img src="assets/images/radare2/radare2_17.png"
+                    alt="Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)">
+            </a>
+            
+        </li>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">June 3, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="opsec-2.html">Operational security techniques in asymmetric conflicts - II (device acquisitions)</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="opsec-2.html">
+                <img src="assets/images/opsec/opsec2.png"
+                    alt="Operational security techniques in asymmetric conflicts - II (device acquisitions)">
+            </a>
+            
+        </li>
+        
+    </ul>
+</section>
+
+<!-- Create a sorted array of tags -->
+ 
+<section class="widget widget-tagcloud">
+    <h2 class="widget-title">Tags</h2>
+    <div class="tagcloud">
+        
+        <a href='https://artik.blue/tag/analysis/'>analysis</a>
+        
+        <a href='https://artik.blue/tag/anonymous/'>anonymous</a>
+        
+        <a href='https://artik.blue/tag/apis/'>apis</a>
+        
+        <a href='https://artik.blue/tag/arduino/'>arduino</a>
+        
+        <a href='https://artik.blue/tag/asm/'>asm</a>
+        
+        <a href='https://artik.blue/tag/asyncio/'>asyncio</a>
+        
+        <a href='https://artik.blue/tag/atmel/'>atmel</a>
+        
+        <a href='https://artik.blue/tag/c/'>c</a>
+        
+        <a href='https://artik.blue/tag/communities/'>communities</a>
+        
+        <a href='https://artik.blue/tag/hacktivism/'>hacktivism</a>
+        
+        <a href='https://artik.blue/tag/hacktivists/'>hacktivists</a>
+        
+        <a href='https://artik.blue/tag/linux/'>linux</a>
+        
+        <a href='https://artik.blue/tag/opsec/'>opsec</a>
+        
+        <a href='https://artik.blue/tag/processing/'>processing</a>
+        
+        <a href='https://artik.blue/tag/python/'>python</a>
+        
+        <a href='https://artik.blue/tag/r/'>r</a>
+        
+        <a href='https://artik.blue/tag/radare/'>radare</a>
+        
+        <a href='https://artik.blue/tag/relay/'>relay</a>
+        
+        <a href='https://artik.blue/tag/reversing/'>reversing</a>
+        
+        <a href='https://artik.blue/tag/shellcode/'>shellcode</a>
+        
+        <a href='https://artik.blue/tag/shodan/'>shodan</a>
+        
+    </div>
+</section>
+
+
+		</div><!-- .sidebar-inside -->
+	</div><!-- .sidebar-scrollable -->
+</aside><!-- .sidebar -->
+    
+  <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '', { 'anonymize_ip': true });
+  </script>
+
+    <!-- Javascript Assets -->
+    <script src="assets/js/jquery-3.3.1.min.js"></script>
+    <script src="assets/js/plugins.js"></script>
+    <script src="assets/js/custom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+
+</html>

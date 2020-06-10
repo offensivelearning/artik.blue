@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+        <title>Reverse engineering course (with radare2)</title>
+        <meta name="description" content="Alternate use of modern technology also known as hacking.">
+        <link rel="canonical" href="reversing.html">
+    
+
+    <!-- Site Favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/png" />
+
+    <!-- Font Embed Code -->
+    <link href="https://fonts.googleapis.com/css?family=Karla:400,400i,700,700i" rel="stylesheet" />
+
+    <!-- CSS Styles -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/light.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+    
+
+</head>
+
+
+
+<body class="layout-page">
+    <div id="page" class="site">
+
+        
+        <header id="masthead" class="site-header outer">
+    <div class="site-header-inside">
+        <div class="site-branding">
+            
+                <p class="site-logo"><a href="index.html" rel="home"><img src="assets/images/logo.png" alt="Artik blue" /></a></p>
+                <h1 class="site-title screen-reader-text"><a href="reversing.html" rel="home">Artik blue digital thoughts</a></h1>
+            
+        </div><!-- .site-branding -->
+        <nav id="main-navigation" class="site-navigation" aria-label="Primary Navigation">
+            <ul class="menu">
+            
+                <li class="menu-item"><a href="about.html">About</a></li>
+            
+                <li class="menu-item"><a href="reversing.html">Reversing</a></li>
+            
+            </ul>
+            <button id="sidebar-show" class="sidebar-toggle"><span class="screen-reader-text">Open Sidebar</span><span class="icon-more" aria-hidden="true"></span></button>
+        </nav><!-- .site-navigation -->
+    </div><!-- .site-header-inside -->
+</header><!-- .site-header -->
+        
+
+        <div id="content" class="site-content fadeInDown delay_075s">
+    <main id="main" class="site-main outer">
+        <article class="post-full inner">
+            <header class="post-header">
+                <h1 class="post-title">Reverse engineering course (with radare2)</h1>
+            </header><!-- .post-header -->
+            
+            <div class="post-content">
+                <div class="row justify-content-between">
+<div class="col-md-8 pr-5">
+<p>Some notes on reverse engineering on various architectures, mostly using free software such as the radare2 framework, gdb, frida, x64dbg among others</p>
+
+<i><a href="https://www.twitter.com/artikblue">Wanna show your support to these materials? Follow me on twitter at @artikblue and let me know</a>If I see interest I'll post more :)</i>
+<hr />
+<h3>Reversing basic C code (x86)</h3>
+<hr />
+<ul>
+  <li><a href="reversing-radare2-1.html">Reversing x32/x64 with radare2 - 1 (intro) </a></li>
+  <li><a href="reversing-radare2-2.html">Reversing x32/x64 with radare2 - 2 (conditionals) </a></li>
+  <li><a href="reversing-radare-3.html">Reversing x32/x64 with radare2 - 3 (funcs, cases and loops)</a></li>
+  <li><a href="reversing-radare-4.html">Reversing x32/x64 with radare2 - 4 - I (arrays and strings)</a></li>
+  <li><a href="reversing-radare-4-ii.html">Reversing x32/x64 with radare2 - 4 - II (more strings)</a></li>
+  <li><a href="reversing-radare-5.html">Reversing x32/x64 with radare2 - 5 (var types and casting)</a></li>
+  <li><a href="reversing-radare-6.html">Reversing x32/x64 with radare2 - 6 (multi dimensional arrays and structs)</a></li>
+  <li><a href="reversing-radare-7.html">Reversing x32/x64 with radare2 - 7 (struct arrays, r2pm and patching)</a></li>	
+  <li><a href="reversing-radare-8.html">Reversing x32/x64 with radare2 - 8 - I (files: read, write, seek and some heaps)</a></li>
+  <li><a href="reversing-radare-8-i.html">Reversing x32/x64 with radare2 - 8 - II (crackmes)</a></li>
+  <li><a href="reversing-radare-9.html">Reversing x32/x64 with radare2 - 9 (pointers and dynamic memory)</a></li>
+  <li><a href="reversing-radare-10.html">Reversing x32/x64 with radare2 - 10 (more pointers and dynamic structs)</a></li>
+  <li><a href="reversing-radare-11.html">Reversing x32/x64 with radare2 - 11 (linked lists, enums, bitwise operations and r2pipe)</a></li>
+  <li><a href="reversing-radare-12.html">Reversing x32/x64 with radare2 - 12 (defines, unions and bitmaps)</a></li>
+</ul>
+<hr />
+<h3>Advanced topics on reversing C code (Windows and Unix)</h3>
+<hr />
+<ul>
+  <li><a href="reversing-radare-13.html">Reverse engineering x64 binaries with Radare2 - 13 (linux systems programming: theory, syscalls, files and ESIL)</a></li>
+  <li><a href="reversing-radare-14.html">Reverse engineering x64 binaries with Radare2 - 14 (the windows api: theory, helloworld and files)</a></li>
+  <li><a href="reversing-radare-15.html">Reverse engineering x64 binaries with Radare2 - 15 - I (unix sockets fundamentals)</a></li>
+  <li><a href="reversing-radare-16.html">Reverse engineering x64 binaries with Radare2 - 15 - II (more sockets, http emulation, radasm, ragg and shellcode)</a></li>
+</ul>
+</div></div>
+
+            </div>
+        </article>
+        
+    </main>
+</div>
+
+        
+
+        
+
+        <footer id="colophon" class="site-footer outer">
+            <div class="site-footer-inside">
+                <p class="social-links">
+    
+    <a href="https://twitter.com/artikblue" target="_blank">
+        <span class="fa-twitter fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">Twitter</span>
+    </a>
+    
+    
+    
+    <a href="https://github.com/artikblue" target="_blank">
+        <span class="fa-github fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">GitHub</span>
+    </a>
+    
+    
+    
+    
+    <a href="https://medium.com/@artikblue" target="_blank">
+        <span class="fa-medium fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">medium</span>
+    </a>
+    
+    
+    
+    
+    
+</p>
+                <p class="site-info">
+                    <a href="reversing.html#">Artik blue</a> &copy; 2020 . Horace theme by
+                    <a target="_blank" href="https://justgoodthemes.com/">JustGoodThemes</a>. <br />
+                    Powered by <a target="_blank" href="https://jekyllrb.com/">Jekyll</a>.
+                </p>
+                <p class="back-to-top">
+                    <a id="top-button" class="top-button" href="reversing.html#page">
+                        <span class="icon-arrow-up" aria-hidden="true"></span>
+                        <span class="screen-reader-text">Back to top</span>
+                    </a>
+                </p>
+            </div><!-- .site-footer-inside -->
+        </footer><!-- .site-footer -->
+    </div><!-- .site -->
+    <div id="site-overlay" class="site-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+	<div class="sidebar-scrollable">
+		<div class="sidebar-inside">
+			<button id="sidebar-hide" class="sidebar-toggle"><span class="screen-reader-text">Close Sidebar</span><span
+				    aria-hidden="true" class="icon-close"></span></button>
+			<nav id="sidebar-navigation" class="widget site-navigation">
+				<h2 class="widget-title">Explore Site</h2>
+				<ul class="menu">
+					
+						<li class="menu-item"><a href="about.html">About</a></li>
+					
+						<li class="menu-item"><a href="reversing.html">Reversing</a></li>
+					
+				</ul>
+			</nav>
+			
+<section class="widget widget-text">
+    <h2 class="widget-title">About Artik blue</h2>
+    <p>Alternate use of modern technology also known as hacking.</p>
+</section>
+
+
+<section class="widget widget-recent-posts">
+    <h2 class="widget-title">Recent Articles</h2>
+    <ul>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">December 1, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="shodan-intelligence-1.html">Generating contextual geographic intelligence with shodan</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="shodan-intelligence-1.html">
+                <img src="assets/images/shodan.png"
+                    alt="Generating contextual geographic intelligence with shodan">
+            </a>
+            
+        </li>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">June 4, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="reversing-radare-16.html">Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="reversing-radare-16.html">
+                <img src="assets/images/radare2/radare2_17.png"
+                    alt="Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)">
+            </a>
+            
+        </li>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">June 3, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="opsec-2.html">Operational security techniques in asymmetric conflicts - II (device acquisitions)</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="opsec-2.html">
+                <img src="assets/images/opsec/opsec2.png"
+                    alt="Operational security techniques in asymmetric conflicts - II (device acquisitions)">
+            </a>
+            
+        </li>
+        
+    </ul>
+</section>
+
+<!-- Create a sorted array of tags -->
+ 
+<section class="widget widget-tagcloud">
+    <h2 class="widget-title">Tags</h2>
+    <div class="tagcloud">
+        
+        <a href='https://artik.blue/tag/analysis/'>analysis</a>
+        
+        <a href='https://artik.blue/tag/anonymous/'>anonymous</a>
+        
+        <a href='https://artik.blue/tag/apis/'>apis</a>
+        
+        <a href='https://artik.blue/tag/arduino/'>arduino</a>
+        
+        <a href='https://artik.blue/tag/asm/'>asm</a>
+        
+        <a href='https://artik.blue/tag/asyncio/'>asyncio</a>
+        
+        <a href='https://artik.blue/tag/atmel/'>atmel</a>
+        
+        <a href='https://artik.blue/tag/c/'>c</a>
+        
+        <a href='https://artik.blue/tag/communities/'>communities</a>
+        
+        <a href='https://artik.blue/tag/hacktivism/'>hacktivism</a>
+        
+        <a href='https://artik.blue/tag/hacktivists/'>hacktivists</a>
+        
+        <a href='https://artik.blue/tag/linux/'>linux</a>
+        
+        <a href='https://artik.blue/tag/opsec/'>opsec</a>
+        
+        <a href='https://artik.blue/tag/processing/'>processing</a>
+        
+        <a href='https://artik.blue/tag/python/'>python</a>
+        
+        <a href='https://artik.blue/tag/r/'>r</a>
+        
+        <a href='https://artik.blue/tag/radare/'>radare</a>
+        
+        <a href='https://artik.blue/tag/relay/'>relay</a>
+        
+        <a href='https://artik.blue/tag/reversing/'>reversing</a>
+        
+        <a href='https://artik.blue/tag/shellcode/'>shellcode</a>
+        
+        <a href='https://artik.blue/tag/shodan/'>shodan</a>
+        
+    </div>
+</section>
+
+
+		</div><!-- .sidebar-inside -->
+	</div><!-- .sidebar-scrollable -->
+</aside><!-- .sidebar -->
+    
+  <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '', { 'anonymize_ip': true });
+  </script>
+
+    <!-- Javascript Assets -->
+    <script src="assets/js/jquery-3.3.1.min.js"></script>
+    <script src="assets/js/plugins.js"></script>
+    <script src="assets/js/custom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+
+</html>

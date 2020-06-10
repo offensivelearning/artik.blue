@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+        <title>Operational security techniques in asymmetric conflicts - I (threat modeling)</title>
+        <meta name="description" content="About asymmetric conflicts">
+        <link rel="canonical" href="opsec-1.html">
+    
+
+    <!-- Site Favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/png" />
+
+    <!-- Font Embed Code -->
+    <link href="https://fonts.googleapis.com/css?family=Karla:400,400i,700,700i" rel="stylesheet" />
+
+    <!-- CSS Styles -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/light.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+    
+
+</head>
+
+
+
+<body class="layout-post">
+    <div id="page" class="site">
+
+        
+        <header id="masthead" class="site-header outer">
+    <div class="site-header-inside">
+        <div class="site-branding">
+            
+                <p class="site-logo"><a href="index.html" rel="home"><img src="assets/images/logo.png" alt="Artik blue" /></a></p>
+                <h1 class="site-title screen-reader-text"><a href="opsec-1.html" rel="home">Artik blue digital thoughts</a></h1>
+            
+        </div><!-- .site-branding -->
+        <nav id="main-navigation" class="site-navigation" aria-label="Primary Navigation">
+            <ul class="menu">
+            
+                <li class="menu-item"><a href="about.html">About</a></li>
+            
+                <li class="menu-item"><a href="reversing.html">Reversing</a></li>
+            
+            </ul>
+            <button id="sidebar-show" class="sidebar-toggle"><span class="screen-reader-text">Open Sidebar</span><span class="icon-more" aria-hidden="true"></span></button>
+        </nav><!-- .site-navigation -->
+    </div><!-- .site-header-inside -->
+</header><!-- .site-header -->
+        
+
+        <div id="content" class="site-content fadeInDown delay_075s">
+    <main id="main" class="site-main outer">
+        <article class="post-full inner">
+            <header class="post-header">
+                <div class="post-meta">
+                    <time class="post-date" datetime="2020-05-29">May 29,
+                        2020</time>
+                </div><!-- .post-meta -->
+                <h1 class="posttitle">Operational security techniques in asymmetric conflicts - I (threat modeling)</h1>
+            </header><!-- .post-header -->
+            
+            <div class="post-thumbnail"><img class="featured-image img-fluid" src="assets/images/opsec/opsec1.jpg"
+                    alt="Operational security techniques in asymmetric conflicts - I (threat modeling)"></div>
+            
+            <div class="post-content">
+                <h3 id="about-asymmetric-conflicts">About asymmetric conflicts</h3>
+
+<p>According to WikiPedia:</p>
+
+<p><em>Asymmetric warfare (or asymmetric engagement) is war between belligerents whose relative military power differs significantly, or whose strategy or tactics differ significantly. This is typically a war between a standing, professional army and an insurgency or resistance movement militias who often have status of unlawful combatants.</em></p>
+
+<p>On this modern times we are living in it becomes clear that our fundamental rights are constantly threatened, especially in certain countries. This writtings go to every individual who is concerned about human rights, freedom and democracy and is willing to take actions to defend them.</p>
+
+<p>Would you need to read this particular essay if you already are a large organization or a government? Probably not as you may have some years of experience behind and access to a large network of experts on the topic. This essay is especially dedicated to those individuals or small organizations willing to take actions for a particular cause cause they believe in. Said that, security professionals and amateurs on the topic may find these writtings interesting and  useful as well.</p>
+
+<h3 id="operational-securitty">Operational securitty</h3>
+
+<p>Again Wikipedia:</p>
+
+<p><em>Operations security (OPSEC) is a process that identifies critical information to determine if friendly actions can be observed by enemy intelligence, determines if information obtained by adversaries could be interpreted to be useful to them, and then executes selected measures that eliminate or reduce adversary exploitation of friendly critical information.</em></p>
+
+<p>On these writtings I’ll go over the topic of operational security in the specific contenxt of an asimetric confflict where a potential adversary is far above the organization in terms of size, resources and procedures. Here we’ll focus on the digital world, as everything revolves around it now and in some way the use of digital technologies “democratizes” certain actions leveling us with our adversaries.</p>
+
+<p>The ultimate goal of these writtings is to present a set of techniques that can be used to identify our threats and thus protect our digital information and operational procedures.</p>
+<h3 id="introduction-to-threat-modeling">Introduction to threat modeling</h3>
+
+<p>Threat modeling is all about identifying the (principal) potential threats you may find during the course of your activities for then designing some security strategies to prevent face them.</p>
+
+<p>Threat modeling is often very abstract and somehow hard to define, I personally think that the best way to go over the topic is by some examples, on this essay I’ll present several of them.</p>
+<h4 id="electronic-devices-and-stored-information">Electronic devices and stored information</h4>
+
+<p>Information is everywhere around us now, on these modern times we are living it is quite frequent to see how most of us are constantly storing all kinds of information related to our activities, interests, our relatives and our health. If that’s not enough, we even get to share it over the internet with other people through social networks and messaging apps sometimes even without thinking, we have accepted a particular reality that can be easily used against us at anytime.</p>
+
+<p>It is always interesting to reflect on the reasons that drive us to store such information in our devices. In many occasions the way in which we store information prevents us from being able to manage it as well as making us forget about the quantity and also the kind of information we are storing, social norms, acquired behaviors and laziness frecuently make us store lots of useless and irrelevant but also sensitive files inn our devices and totally forget about its presence and that makes us ask some initial questions:</p>
+
+<p>Do we really need to keep track of any activity we do? Do we delete our files when they become “obsolete”? Do we actually know what kind of information is being generated and stored in  our devices? Do we have any interest on knowing it?</p>
+
+<p>Wether we like it or not, our electronic “gadgets”, especially our telephones, watches and any other “smart” device we may have do frequently collect, store and even share data automatically and transparently to us (we may call that, meta-data), many times such data (that is generated automatically) can be quite personal as well as in many times we can do little to avoid that from happening. Said that, I want to state that this eassay will have little focus on that kind of information, the meta-data, the one that is generated/stored/shared automatically by our apps and systems for marketing, general statistics or performance analysis purposes we’ll go over the topic in specific scenarios where that information can be used for harming or compromising our operations but as a general norm we’ll focus on the information we work with the one that we consciously store in our devices, from an operational point of view.</p>
+
+<p>So, the information that is stored on a physical medium, just by itself, does not pose any risk to us (the user), the information becomes a risk when it is accessed by a potential adversary and obviously the risk will be higher or lower depending on its type in relation to the interests of the adversary, that is the point where adversasry identification and threat modeling become especially relevant.</p>
+
+<p>Let’s imagine the following situation: A naive young activist, a bit unaware of his personal safety and not so versed in opsec techniques is out there carrying out a certain protest action, it is the seventh or perhaps the eight action carried out in the last month without any apparent problem and the young man is comfortable and confident thinking that the whole thing is under control, thinking that his adversary (the police) is dumb and ineffective against him and his group. However, after the protest, at one point of his way back home he separates from his friends and is then surrounded and stopped, then arrested by police agents by surprise. During the arrest, the police forces take his backpack, empty his pockets and seize all of the young man’s stuff, including his smartphone. Since the phone is powered on, not encrypted and in general terms it does not have any kind of special security measure to prevent it from being accessed those agents can now access all of its contents. While the (now) detainee is being held in the “dungeons”, police forces use some kind of “forensic” computer program to analyze the device and get to find:</p>
+
+<ul>
+  <li>History of messages and conversations on messaging apps</li>
+  <li>Pictures taken during some protests, including pictures of other members of the organisation</li>
+  <li>Old pictures of the activist along with other activists in certain actions</li>
+  <li>Pictures from various places where the young man and his friends usually hang out</li>
+  <li>Geo-tagged data related to sports apps</li>
+  <li>Telephone numbers associated to names of his relatives and also some “suspicious nicknames”</li>
+  <li>Tons of data related to social media (presence in groups, interests and more)</li>
+</ul>
+
+<p>Thus, while a couple of agents get rid of the activist interrogating and threating  him, another pair of them download his personal information and store it in a “safe place”. After a few hours and with all the paperwork done, the activist is released.</p>
+
+<p>Days go by and the organization continues to carry out small actions without major problems. However, after a few months and quite suddenly, its members begin to be detained one after another, and to their surprise, some evidences relating them to the actions that took place start to appear almost out of nowhere leading them straight to jail, after a few weeks, the organization is completely dismantled.</p>
+
+<p>As the inexperienced activist left the police station and was again getting ready to rejoin the “subversive” activity, a spontaneous question came to his mind: What did the agents do with his personal devices while under arrest? At first thought, the young man figured out the worst, but then he tought about the bill of rights and all of the laws that relate to privacy and detentions, he thought that as he’s living in a state that runs under “the rule of law” his privacy was somehow guaranteed and his phone would not have been “tapped” since this this would requiere carrying out a “whole series of very complex legal procedures” and “the police did not have any evidence against him”. As the boy continued to walk, he could not get that topic out of his head, finally concluding that despite the agents having wanted to access his phone, it was protected with an unlock pattern so… little could have been achieved against that… (wrong)</p>
+
+<p>Reality differs a bit from what our favorite activist was thinking about. Reality is that the agents, using a specific set of “forensic” software tools, had managed to access all of the information on the device and indeed, their intention was in no case to use such data as a kind of proof in the court or anything. Instead, the agents used that information to start a large-scale investigation against the organization as a whole: They checked and contrasted the list of phone numbers found on the activist’s phone with their internal databases, which together with previously obtained information, allowed them to generate a map of the members of the organization. Through the information related to the social networks used by the activist, they managed to establish relationships and even hirearchies among the members of the group, to define the ideological profile of the organization as well as some relationships with several other similar groups. Through the obtained photos, they were able to identify frequent meeting points and with the data related to outdoor activities / sports they went even further and were able to identify and geolocate areas habitally frequented by the “social circle” of the activist.</p>
+
+<p>All this together allowed them to generate a large list of hints and interesting starting points, which were used to start all of the necessary actions in court to demand formal permissions to start a full scale investigation being now allowed to: physically monitor the activities of the group, remotely tamper their phones and even break into their homes. At that point of the investigation, they were able to collect a large list of evidences, more than enough to send the whole organization straight to jail.</p>
+
+<p>The label “based on real facts” should be added along with this hypothetical case “as a colophon” because unfortunately for them, many “clandestine” or even legitimate organizations, even the ones that go after the most noble goals have seen their activity completely jeopardized due to the lack of proper operation security procedures and therefore for the neglect of some of their members.</p>
+
+<p>Going back now to threat modeling, we can say that the ultimate goal of (relating to the presented context) state security / police organizations is no othere than to completely dismantle any kind of subversive organization that they consider to be a threat to the status quo, and the term “completely” should be emphasized here. Little effectiveness is achieved by arresting a handful of low level members of the organization, since the cadres and therefore the strategies of the group remain intact and so they just can “recruit” new personel and thus nurture its ranks of activists again and again. POlice forces, aware of this, do often try to approach the organization follow its movements closely without taking further actions for a while. They will try to recruit potential “snitches” among their ranks and use them to collect valuable infrormation from the inside, that can be later used to generate actionable intelligence in ongoing investigations or even as an evidence in court. They will often wait as long as necessary, letting the organization go freely making it belive  that the police ofrces are ineffective against their activities, seeking to build a feeling of “confidence” among its members that may lead them to carelessness, and carelessness always leads to failure. Actions such as intentionally releasing an arrested member or letting some of the members “escape” from a police raid are usual. As (as presented) an arrested member can leave the police station with a tampered device used (now) by the police to collect valuable information. Members who are intentionally “let go” during a police raid can actually be followed and watched closely and used to know about the places where they go to seek refuge, thus knowing more about the organization’s structure, about non identified members and other potentially “ally” dangerous organizations. Depending on how “political” and influencial the target organization is, arrests can happen on specific moments such as in the middle of a political campaign or a big event as a “political move”, but again, that may depend a lot on the country and the organization.</p>
+
+<p>The reader will habe been able to infer a specific concept from the history that has just been presented: Our adversary has a very clear set of goals and when it comes to protecting our private information we must rely not on legal or ethic questions but only on technical means and specific procedures. We start by identifying what our adversary is capable of doing, without thinking about the legaility or morality of its actions, since we will suppose that those concepts can fluctuate in time or even vanishs if the circumstances do favor it. Then we must always put ourselves in the worst-case-scenario, because fortune is capricious and having covered the worst case, anything else will also be covered.</p>
+
+<h4 id="initial-concepts">Initial concepts</h4>
+
+<p>If we start looking at all of the successfull collective actions that happened over time we’ll soon realize a common denominator: The vast majoritty of them were in no case the result of a spontaneous combustion perhaps they were prepared in a meticulous way time before finally being executed, taking all of the safety and security measures needed for its success.</p>
+
+<p>So we can say that the decisions made in the early stages of an action/organization will have the strongest influence on its success in the future. As discussed in the previous section, an organization can be compromised in many many ways, mainly due to the exploitation of vulnerabilities in some of their internal elements. Once the security comprimise occurs, the organization can become “infected” in the same way as a biological organism is infected by a virus. The threat can remain silent on the inside and attack at any convinient time in the future. To all of this, we must understand, therefore, that when there is a specific desire to protect certain information, there will be an adversary capable of investing the requiered resources and time to access that information, and what is even more important: eventually such adversary will be able to access the information, period. The answer to this approach is very clear: The best way to protect a particular information is not to generate it, anything that only happens inside of your head and is not written down remains hidden and cannot be digitally copied. It is obvious though that we would not be going througgh this lines if that approach would be enough, it is obvious that we’ll need to generate and exchange information during the course of our actions. We must always try to store the minimum amount of information as possible in relation to the topic, deleting it safely when it is no longer necessary.</p>
+
+<p>All of this sounds too abstract, How do we define what kind of information is necessary? Where do we set the minimum? How do we know when it won’t be needed anymore? The best way to answer these questions is to return to the example of the young activist. So, the boy came home after the protest carrying his personal phone with him, a phone where he had information related to some of the (other) activities carried out by the group and also personal information related to his social life (his real identity, actual friends and such). The activist kept old conversation records as well as old pictures and data related to his friends, classmates and family. There was no need at all to keep those old photos or conversations, not to mention the enormous risk that usingg the same device can entail for both his operation activity and personal life. THe arrest and registration of the activist would very likely have become “irrelevant” to the organization if he had had a specific encrypted device for his “operational activity” without any personal information about him and with the minimum amount of information necessary for the tasks to be done.</p>
+
+<p>We may think that an agent who managed to compromise an “operational phone” such as the one we just described, would immediately suspect that the arrested individual belongs to a well-organized and therefore dangerous “subversive structure”, which would arouse interest among gov. organizations that would start to track the individual and look at him more closely. And yes, that approach is perefectly valid and precisely leads us to another postulate here: In this world everything emits information, everything says something even the stuff that remains silent since by  saying nothing it is clear that there is an interest in saying nothing (or hidding something). We’ll reflect in greater depth on this later on in these posts, however for now, we must understand that as the individual has been detained this is probably due to the fact that there is already some suspicion about his activity and that the fact of losing sensitive information in this context represents a greater threat than generating a simple suspicion. Of course, more advanced schemes can be adopted here in relation to this problem such as preparing and having a fake-phone ready associated with a fake identity for disinformation purposes and so forth.</p>
+
+<p>As Mao said, the revolution is not a dinner party and it is mandatory to emphasize that our adversary has much more advanced means than us and is on and working 24/7. Therefore what has to be very clear here is that even with the best security strategies being deployed, both operational and personal devices will eventually be accessed, so we must visualize these situations and reflect on the kind of information to which our adversaries will be able to access as well as the impact that such access can have to us.</p>
+
+<p>As I know that you came here looking for specific guidelines here I present some as a conclusion to this point:</p>
+
+<ul>
+  <li>Individuals should have as many devices as necessary for his operational activity, everything must be separated</li>
+  <li>Personal devices of the members of the organization should follow the same security principles as the operational devices</li>
+</ul>
+
+<p>And when it comes to operational devices</p>
+
+<ul>
+  <li>They must be purchased safely</li>
+  <li>They must have all possible security measures according to the organization’s means</li>
+  <li>They should not contain any personal information about the members of the group</li>
+  <li>Should not contain, as far a possible, information that can lead to the identification of members, resources and procedures of the organization.</li>
+  <li>During any operation, only the operational device should be carried</li>
+  <li>If possible, operational devices should be periodically checked for “tampering” detection</li>
+  <li>They must be destroyed in case we have strong suspicions on their possible comprromise</li>
+</ul>
+
+<h3 id="know-your-adversary">Know your adversary</h3>
+
+<p>Said that, one may think that this essay on operational security strictly relates to subversive organizations fighting the government or such, that is not the case. The presented example relates to a very specific and illustrative case but on these writtings we’ll deal with various adversaries. Some of them are the ones presented below, note that this a very very brief generalisation.</p>
+
+<h4 id="private-companies">Private companies</h4>
+
+<p>It is clear that private companies are always after economic profit. So in general terms, their activities will often relate to corporate espionage. Private companies, especially the ones that are big enough (think about large inter national corporations with interests on many topics) may try to get access to industrial designs and business strategies to use it and take advantadges over potential competitors. On the other hand they may try to access to sensitive information for defense purposes, often related to business strategies or even information related to political actors (not that frequent for obvious reasons).</p>
+
+<p>They may have enough resources to pay for a specific “phone tampering” system or perhaps a PE. They’ll prefeer to be as silent as possible and avoid breaking the law though.</p>
+
+<h4 id="criminal-organisations">Criminal organisations</h4>
+
+<p>By the way, criminal organizations (such as drug, weapons, human trafficking, etc) are just private companies that operate above the law, they are also after economic profit. They will seek similar goals but in a way more hostile way. As they won’t go by the law, they’ll try to get information on whoever or whatever they may think it threatens their interests. They’ll often have a strong interest in obtaining information related to police (for obvious reasons) and government, so they can corrupt their environment and operate in a more relaxed way. Said that, we have to note that in general terms, professional organized crime organizations (contrary to the general thinking) do want to operate in the most quiet way.</p>
+
+<p>Regarding to their means: it is difficult to do a complex in depth analysis here because different organizations will operate differently but the common denominator will always be the money. These organizations do have access to large amounts of money, so if they have a strong interest in something they can easily pay for it. They will often have access to very secure encrypted devices and their operational security will usually be decent, as they have to face police agencies on a daily basis.</p>
+
+<p>You definetely don’t want to be on their list.</p>
+
+<h4 id="hacktivist-groups-and-internet-communities">Hacktivist groups and internet communities</h4>
+
+<p>Hacktivists and “organized” internet communities in general, tend to have goals which are more related to their ideology. They may go after you if they think that you represent something they strongly oppose to. They may go after someone if that person opposes their belief scheme and is starting to become very relevant for some reason.</p>
+
+<p>Those groups don’t tend to be very advanced or agressive on their actions but can bother you for sure.</p>
+
+<p>Common actions carried by those groups include small and simple cyber attacks that intend to be very loud and “notorious” such as web “defacements” and data leaks and also “doxing” which involves identifying the real identity behind a target account or maybe some relevant personal information about an individual and making it public on the internet, maybe to instigate a physical action by some third parties. Operational security here comes to be relevant specially for you to avoid being “doxed”, if you are carrying any kind of “clandestine” activity you don’t want to be “doxed”.</p>
+
+<h4 id="political-organisations">Political organisations</h4>
+
+<p>Political organizations can be a bit like those internet communities. The main difference here is that they may be “less technical” than the average “hacktivist” organization (but they may be associated with “hacktivits” as well) and they will focus their activities on opposing groups. They will often try to use open source intelligence techniques not only to “dox” opposing individuals but to try to do some research on them, looking from some stuff that may compromise their political activities.</p>
+
+<p>They will often try to generate fake or controversial content on the internet to mobilize their followers to take certain actions but that goes a little beyond the scope of this essay.</p>
+
+<h4 id="journalists">Journalists</h4>
+
+<p>Journalists are always after attention and will often try to get it at all costs. For each ethical journalist you’ll find dozens of “unethical” ones that will do whats needed to get their attention, and it is kind of understandable, at the end they want to make their salary I guess. Their skills may very a lot but in general terms they won’t want to go above the law.</p>
+
+<h4 id="police-agencies">Police agencies</h4>
+
+<p>Their goal is very clear, they’ll go after any organization that goes above the law. They use to have very specialized units related to information gathering and analysis, those are the ones you should be worried about, mainly because they may start tracking you if you just look suspicious even if you haven’t done anything (yet). As they deal with this kind of stuff on a daily bassis, they have specialized professionals, technology and a whole lot of experience on the topic. They’ll have automatic forensic and remote exploit platforms to track suspicious individuals and organizations as well as a very structured and formal set of process, they’ll work 24/7 to track you down.</p>
+
+<p>On the other hand, they’ll usually rely on third parties as individual police offiers tend to have a more “generalistic” role. They may also be very slow when it comes to start an investigation, probably due to bureaucracy.</p>
+
+<h4 id="intelligence-agencies">intelligence agencies</h4>
+
+<p>Intelligence agencies may have similar goals on some aspects, but in general terms they’ll be more focused on foreign organizations. Usually they’ll have the most advanced technical means and procedures as well as access to a worldwide network of allies. Based on that it is important for you to not think that because you live in a third world country its intelligence lacks the technical means needed for “tampering” your device, they may politely ask some of its allies for that.</p>
+
+<p>The means, procedures and goals of these agencies may vary a lot depending on the country, some may be very agressive and even violent, some may be silent and efficient, some very technical, some very “politically” focused etc. As a general norm assume that they’ll be after some sensitive information you may posses and they won’t have any interest in “stopping” or “detaining” you, they’ll just sit and listen, direct action may come through the hand of the police.</p>
+
+<p>As those topics are very broad we’ll dedicate one chapter per each to go more in depth.</p>
+
+
+            </div>
+            <footer class="post-footer">
+                
+                <p class="post-tags">
+                     
+                    <a href='https://artik.blue/tag/opsec/'>opsec</a>
+                    
+                    
+                </p>
+                
+                <div class="post-share">
+                    <span class="post-share-title">Share:</span>
+                    <a target="_blank" href="https://twitter.com/share?text=Operational+security+techniques+in+asymmetric+conflicts+-+I+%28threat+modeling%29&amp;url=https://artik.blue/opsec-1">Twitter</a>
+                    <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://artik.blue/opsec-1">Facebook</a>
+                </div><!-- .share-post -->
+            </footer>
+            <div class="author-box">
+                <div class="author-avatar"><img src="assets/images/avatar.png" alt="Artikblue's Picture"
+                        class="avatar"></div>
+                <div class="author-details">
+                    <h2 class="author-title">About Artikblue</h2>
+                    <p class="author-description"></p>
+                </div>
+            </div>
+            
+<section id="comments-area" class="comments-area">
+    <h2 class="comments-title">Comments</h2>
+    <div class="comments-inside">
+        <div id="disqus_thread"></div>
+    </div><!-- .comments-inside -->
+    <div id="comments-overlay" class="comments-overlay">
+        <a href="opsec-1.html#" id="comments-show" class="comments-show">Show comments</a>
+    </div><!-- .comments-overlay -->
+    <script type="text/javascript">
+        var disqus_shortname = 'artikblue';
+        var disqus_developer = 0;
+        (function () {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+        </article>
+        
+        <section class="read-next inner">
+            <h2 class="read-next-title">Read Next</h2>
+            
+            <article class="post">
+                <header class="post-header">
+                    <div class="post-meta">
+                        <time class="published" datetime="May 25, 2020">May 25, 2020</time>
+                    </div>
+                    <h3 class="post-title"><a href="reversing-radare-14.html">Reverse engineering x64 binaries with Radare2 - 15 (Windows fundamentals: Intro to WinApi and file management)</a></h3>
+                    <p class="post-tags">
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/reversing/'>Reversing</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/c/'>C</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/radare/'>Radare</a>
+                        
+                        
+                        
+                    </p>
+                </header>
+                
+                <a href="reversing-radare-14.html" class="post-thumbnail">
+                    <img src="assets/images/radare2/radare2_15.png" alt="Reverse engineering x64 binaries with Radare2 - 15 (Windows fundamentals: Intro to WinApi and file management)" />
+                </a>
+                
+            </article>
+            
+            
+            <article class="post">
+                <header class="post-header">
+                    <div class="post-meta">
+                        <time class="published" datetime="June 1, 2020">June 1, 2020</time>
+                    </div>
+                    <h3 class="post-title"><a href="hacktivism-0.html">Anonymous and the rise of 'hacktivism' as a collective action phenomenon</a></h3>
+                    <p class="post-tags">
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/hacktivism/'>Hacktivism</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/hacktivists/'>Hacktivists</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/anonymous/'>Anonymous</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/communities/'>Communities</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/analysis/'>Analysis</a>
+                        
+                        
+                        
+                    </p>
+                </header>
+                
+                <a href="hacktivism-0.html" class="post-thumbnail">
+                    <img src="assets/images/hacktivism/anonymous_0.jpg" alt="Anonymous and the rise of 'hacktivism' as a collective action phenomenon" />
+                </a>
+                
+            </article>
+            
+        </section><!-- .read-next -->
+    </main><!-- .site-main -->
+</div><!-- .site-content -->
+
+        
+
+        
+
+        <footer id="colophon" class="site-footer outer">
+            <div class="site-footer-inside">
+                <p class="social-links">
+    
+    <a href="https://twitter.com/artikblue" target="_blank">
+        <span class="fa-twitter fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">Twitter</span>
+    </a>
+    
+    
+    
+    <a href="https://github.com/artikblue" target="_blank">
+        <span class="fa-github fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">GitHub</span>
+    </a>
+    
+    
+    
+    
+    <a href="https://medium.com/@artikblue" target="_blank">
+        <span class="fa-medium fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">medium</span>
+    </a>
+    
+    
+    
+    
+    
+</p>
+                <p class="site-info">
+                    <a href="opsec-1.html#">Artik blue</a> &copy; 2020 . Horace theme by
+                    <a target="_blank" href="https://justgoodthemes.com/">JustGoodThemes</a>. <br />
+                    Powered by <a target="_blank" href="https://jekyllrb.com/">Jekyll</a>.
+                </p>
+                <p class="back-to-top">
+                    <a id="top-button" class="top-button" href="opsec-1.html#page">
+                        <span class="icon-arrow-up" aria-hidden="true"></span>
+                        <span class="screen-reader-text">Back to top</span>
+                    </a>
+                </p>
+            </div><!-- .site-footer-inside -->
+        </footer><!-- .site-footer -->
+    </div><!-- .site -->
+    <div id="site-overlay" class="site-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+	<div class="sidebar-scrollable">
+		<div class="sidebar-inside">
+			<button id="sidebar-hide" class="sidebar-toggle"><span class="screen-reader-text">Close Sidebar</span><span
+				    aria-hidden="true" class="icon-close"></span></button>
+			<nav id="sidebar-navigation" class="widget site-navigation">
+				<h2 class="widget-title">Explore Site</h2>
+				<ul class="menu">
+					
+						<li class="menu-item"><a href="about.html">About</a></li>
+					
+						<li class="menu-item"><a href="reversing.html">Reversing</a></li>
+					
+				</ul>
+			</nav>
+			
+<section class="widget widget-text">
+    <h2 class="widget-title">About Artik blue</h2>
+    <p>Alternate use of modern technology also known as hacking.</p>
+</section>
+
+
+<section class="widget widget-recent-posts">
+    <h2 class="widget-title">Recent Articles</h2>
+    <ul>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">December 1, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="shodan-intelligence-1.html">Generating contextual geographic intelligence with shodan</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="shodan-intelligence-1.html">
+                <img src="assets/images/shodan.png"
+                    alt="Generating contextual geographic intelligence with shodan">
+            </a>
+            
+        </li>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">June 4, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="reversing-radare-16.html">Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="reversing-radare-16.html">
+                <img src="assets/images/radare2/radare2_17.png"
+                    alt="Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)">
+            </a>
+            
+        </li>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">June 3, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="opsec-2.html">Operational security techniques in asymmetric conflicts - II (device acquisitions)</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="opsec-2.html">
+                <img src="assets/images/opsec/opsec2.png"
+                    alt="Operational security techniques in asymmetric conflicts - II (device acquisitions)">
+            </a>
+            
+        </li>
+        
+    </ul>
+</section>
+
+<!-- Create a sorted array of tags -->
+ 
+<section class="widget widget-tagcloud">
+    <h2 class="widget-title">Tags</h2>
+    <div class="tagcloud">
+        
+        <a href='https://artik.blue/tag/analysis/'>analysis</a>
+        
+        <a href='https://artik.blue/tag/anonymous/'>anonymous</a>
+        
+        <a href='https://artik.blue/tag/apis/'>apis</a>
+        
+        <a href='https://artik.blue/tag/arduino/'>arduino</a>
+        
+        <a href='https://artik.blue/tag/asm/'>asm</a>
+        
+        <a href='https://artik.blue/tag/asyncio/'>asyncio</a>
+        
+        <a href='https://artik.blue/tag/atmel/'>atmel</a>
+        
+        <a href='https://artik.blue/tag/c/'>c</a>
+        
+        <a href='https://artik.blue/tag/communities/'>communities</a>
+        
+        <a href='https://artik.blue/tag/hacktivism/'>hacktivism</a>
+        
+        <a href='https://artik.blue/tag/hacktivists/'>hacktivists</a>
+        
+        <a href='https://artik.blue/tag/linux/'>linux</a>
+        
+        <a href='https://artik.blue/tag/opsec/'>opsec</a>
+        
+        <a href='https://artik.blue/tag/processing/'>processing</a>
+        
+        <a href='https://artik.blue/tag/python/'>python</a>
+        
+        <a href='https://artik.blue/tag/r/'>r</a>
+        
+        <a href='https://artik.blue/tag/radare/'>radare</a>
+        
+        <a href='https://artik.blue/tag/relay/'>relay</a>
+        
+        <a href='https://artik.blue/tag/reversing/'>reversing</a>
+        
+        <a href='https://artik.blue/tag/shellcode/'>shellcode</a>
+        
+        <a href='https://artik.blue/tag/shodan/'>shodan</a>
+        
+    </div>
+</section>
+
+
+		</div><!-- .sidebar-inside -->
+	</div><!-- .sidebar-scrollable -->
+</aside><!-- .sidebar -->
+    
+  <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '', { 'anonymize_ip': true });
+  </script>
+
+    <!-- Javascript Assets -->
+    <script src="assets/js/jquery-3.3.1.min.js"></script>
+    <script src="assets/js/plugins.js"></script>
+    <script src="assets/js/custom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+
+</html>

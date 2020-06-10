@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+        <title>Reverse engineering 32 and 64 bits binaries with Radare2 - 5 (var types and casting)</title>
+        <meta name="description" content="Hi folks and welcome back to the most awesome reverse engineering with r2 post series 8) Today I’m going to drop some notes on very basic variable types you ...">
+        <link rel="canonical" href="reversing-radare-5.html">
+    
+
+    <!-- Site Favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/png" />
+
+    <!-- Font Embed Code -->
+    <link href="https://fonts.googleapis.com/css?family=Karla:400,400i,700,700i" rel="stylesheet" />
+
+    <!-- CSS Styles -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/light.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+    
+
+</head>
+
+
+
+<body class="layout-post">
+    <div id="page" class="site">
+
+        
+        <header id="masthead" class="site-header outer">
+    <div class="site-header-inside">
+        <div class="site-branding">
+            
+                <p class="site-logo"><a href="index.html" rel="home"><img src="assets/images/logo.png" alt="Artik blue" /></a></p>
+                <h1 class="site-title screen-reader-text"><a href="reversing-radare-5.html" rel="home">Artik blue digital thoughts</a></h1>
+            
+        </div><!-- .site-branding -->
+        <nav id="main-navigation" class="site-navigation" aria-label="Primary Navigation">
+            <ul class="menu">
+            
+                <li class="menu-item"><a href="about.html">About</a></li>
+            
+                <li class="menu-item"><a href="reversing.html">Reversing</a></li>
+            
+            </ul>
+            <button id="sidebar-show" class="sidebar-toggle"><span class="screen-reader-text">Open Sidebar</span><span class="icon-more" aria-hidden="true"></span></button>
+        </nav><!-- .site-navigation -->
+    </div><!-- .site-header-inside -->
+</header><!-- .site-header -->
+        
+
+        <div id="content" class="site-content fadeInDown delay_075s">
+    <main id="main" class="site-main outer">
+        <article class="post-full inner">
+            <header class="post-header">
+                <div class="post-meta">
+                    <time class="post-date" datetime="2020-05-01">May 1,
+                        2020</time>
+                </div><!-- .post-meta -->
+                <h1 class="posttitle">Reverse engineering 32 and 64 bits binaries with Radare2 - 5 (var types and casting)</h1>
+            </header><!-- .post-header -->
+            
+            <div class="post-thumbnail"><img class="featured-image img-fluid" src="assets/images/radare2/radare2_6.png"
+                    alt="Reverse engineering 32 and 64 bits binaries with Radare2 - 5 (var types and casting)"></div>
+            
+            <div class="post-content">
+                <p>Hi folks and welcome back to the most awesome reverse engineering with r2 post series 8) Today I’m going to drop some notes on very basic variable types you may encounter when reversing C code (and in general terms) and we’ll review how casting is done at low level. It will be relatively quick.</p>
+
+<p><img src="assets/images/20min.jpg" alt="20min adventure" /></p>
+
+<p>Casting is a way we have to “convert” a variable of one kind to another kind. By the way, tutorialspoint makes it very easy to understand:</p>
+
+<p>“Converting one datatype into another is known as type casting or, type-conversion. For example, if you want to store a ‘long’ value into a simple integer then you can type cast ‘long’ to ‘int’. You can convert the values from one type to another explicitly using the cast operator as follows − (type_name) expression”</p>
+
+<p>Let’s review a simple example:</p>
+<pre><code class="language-C"># include &lt;stdio.h&gt;
+
+main(){
+
+ func();    
+ getchar();
+}
+
+func(){
+
+int val = 2;
+float a = 5.25;
+
+int b = (int)a;
+
+printf ("%d\n", b);  
+
+}
+</code></pre>
+
+<p>The disasm looks like this:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0x55630491a6a4]&gt; pdf
+/ (fcn) sym.func 65
+|   sym.func ();
+|           ; var int local_ch @ rbp-0xc
+|           ; var int local_8h @ rbp-0x8
+|           ; var int local_4h @ rbp-0x4
+|              ; CALL XREF from 0x55630491a693 (sym.main)
+|           0x55630491a6a4      55             push rbp
+|           0x55630491a6a5      4889e5         mov rbp, rsp
+|           0x55630491a6a8      4883ec10       sub rsp, 0x10
+|           0x55630491a6ac      c745f4020000.  mov dword [local_ch], 2
+|           0x55630491a6b3      f30f1005bd00.  movss xmm0, dword [0x55630491a778] ; [0x55630491a778:4]=0x40a80000
+|           0x55630491a6bb      f30f1145f8     movss dword [local_8h], xmm0
+|           0x55630491a6c0      f30f1045f8     movss xmm0, dword [local_8h]
+|           0x55630491a6c5      f30f2cc0       cvttss2si eax, xmm0
+|           0x55630491a6c9      8945fc         mov dword [local_4h], eax
+|           0x55630491a6cc      8b45fc         mov eax, dword [local_4h]
+|           0x55630491a6cf      89c6           mov esi, eax
+|           0x55630491a6d1      488d3d9c0000.  lea rdi, qword [0x55630491a774] ; "%d\n"
+|           0x55630491a6d8      b800000000     mov eax, 0
+|           0x55630491a6dd      e86efeffff     call sym.imp.printf     ; int printf(const char *format)
+|           0x55630491a6e2      90             nop
+|           0x55630491a6e3      c9             leave
+\           0x55630491a6e4      c3             ret
+[0x55630491a6a4]&gt; 
+</code></pre></div></div>
+<p>At first sight, we can see some new instructions such as movss and the weird cvttss2si we never saw on the previous posts. Also new registers are being used: xmm0. In brief xmm registers that usually go from xmm0 to xmm7 are used to store floating point numbers, they have a size of 128 bits, as a float needs more space than an int.</p>
+
+<p>In a situation such as this, we generally have 2 options we can either try to interpret those instructions one by one and figure out what the program does or we can just set a breakpoint, for example, after xmm0 is stored to local_8h and inspect the content:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0x5634635196a4]&gt; pdf
+/ (fcn) sym.func 65
+|   sym.func ();
+|           ; var int local_ch @ rbp-0xc
+|           ; var int local_8h @ rbp-0x8
+|           ; var int local_4h @ rbp-0x4
+|              ; CALL XREF from 0x563463519693 (sym.main)
+|           0x5634635196a4      55             push rbp
+|           0x5634635196a5      4889e5         mov rbp, rsp
+|           0x5634635196a8      4883ec10       sub rsp, 0x10
+|           0x5634635196ac      c745f4020000.  mov dword [local_ch], 2
+|           0x5634635196b3      f30f1005bd00.  movss xmm0, dword [0x563463519778] ; [0x563463519778:4]=0x40a80000
+|           0x5634635196bb      f30f1145f8     movss dword [local_8h], xmm0
+|           0x5634635196c0      f30f1045f8     movss xmm0, dword [local_8h]
+|           ;-- rip:
+|           0x5634635196c5 b    f30f2cc0       cvttss2si eax, xmm0
+|           0x5634635196c9      8945fc         mov dword [local_4h], eax
+|           0x5634635196cc      8b45fc         mov eax, dword [local_4h]
+|           0x5634635196cf      89c6           mov esi, eax
+|           0x5634635196d1      488d3d9c0000.  lea rdi, qword [0x563463519774] ; "%d\n"
+|           0x5634635196d8      b800000000     mov eax, 0
+|           0x5634635196dd      e86efeffff     call sym.imp.printf     ; int printf(const char *format)
+|           0x5634635196e2      90             nop
+|           0x5634635196e3      c9             leave
+\           0x5634635196e4      c3             ret
+[0x5634635196a4]&gt; 
+
+[0x5634635196a4]&gt; pxw @ 0x563463519778
+0x563463519778  0x40a80000 0x3b031b01 0x00000040 0x00000007  ...@...;@.......
+
+[0x5634635196a4]&gt; drt fpu
+frip = 0x00000000
+frdp = 0x00000000
+st0 = 0x00000000
+st1 = 0x00000000
+st2 = 0x00000000
+st3 = 0x00000000
+st4 = 0x00000000
+st5 = 0x00000000
+st6 = 0x00000000
+st7 = 0x00000000
+xmm0h = 0x40a80000
+xmm0l = 0x00000000
+xmm1h = 0x31747361632f2e
+xmm1l = 0x524f4c4f435f534c
+xmm2h = 0xff00000000000000
+xmm2l = 0x00000000
+xmm3h = 0x0000ff00
+xmm3l = 0x00000000
+xmm4h = 0x2f2f2f2f2f2f2f2f
+xmm4l = 0x2f2f2f2f2f2f2f2f
+xmm5h = 0x00000000
+xmm5l = 0x00000000
+xmm6h = 0x00000000
+xmm6l = 0x00000000
+xmm7h = 0x00000000
+xmm7l = 0x00000000
+x64 = 0x00000000
+[0x5634635196a4]&gt; 
+</code></pre></div></div>
+<p>As we can see, at first local_ch is initialized with 2, thats an easy one it should be a simple int variable, then the content of 0x563463519778 is loaded into xmm0 register and that goes to the variable local_8h. If we inspect the contents of the xmm0 register by using drt, we’ll see 0x40a80000, that corresponds to 5.25 in float.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rax2 Fx40a80000
+5.250000f
+</code></pre></div></div>
+<p>Radare2 can help us with that as it can auto detect variable types, at this point of the program if we do afta, we’ll see how those change:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0x558e5889c6a4]&gt; afvt local_8h float
+[0x558e5889c6a4]&gt; pdf
+/ (fcn) sym.func 65
+|   sym.func ();
+|           ; var int local_ch @ rbp-0xc
+|           ; var float local_8h @ rbp-0x8
+|           ; var int local_4h @ rbp-0x4
+|              ; CALL XREF from 0x558e5889c693 (sym.main)
+|           0x558e5889c6a4      55             push rbp
+|           0x558e5889c6a5      4889e5         mov rbp, rsp
+[...]
+[0x558e5889c6a4]&gt; 
+</code></pre></div></div>
+<p>And with afvt var type we can set the type of the variable ourselves. Regarding to the instructions used here:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>|           0x5634635196b3      f30f1005bd00.  movss xmm0, dword [0x563463519778] ; [0x563463519778:4]=0x40a80000
+|           0x5634635196bb      f30f1145f8     movss dword [local_8h], xmm0
+|           0x5634635196c0      f30f1045f8     movss xmm0, dword [local_8h]
+|           ;-- rip:
+|           0x5634635196c5 b    f30f2cc0       cvttss2si eax, xmm0
+</code></pre></div></div>
+<p>Movss (move scalar single precision floating point value) moves a scalar single-precision floating-point value from the source operand (second operand) to the destination operand (first operand). The source and destination operands can be XMM registers or 32-bit memory locations. So that is basically used as the common mov but for floating point vals as those are bigger. Then cvttss2si (convert with truncation scalar single precision floating point value to integer) is what basically does the casting here, it truncates cuts the decimal part from the float and extracts and int, going from 5.25 to 5. The rest of the disasm should already be familiar to the reader :)</p>
+
+<p>Let’s now do another kind of casting, this time we’ll go from character to integer.</p>
+
+<pre><code class="language-C"># include &lt;stdio.h&gt;
+
+main(){
+
+ func();    
+ getchar();
+}
+
+func(){
+
+char b = 'a';
+
+int x = (int)b;
+printf ("%d", x);
+}
+</code></pre>
+<p>And if we look at the disasm…</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0x55b8bc8c96a4]&gt; pdf
+/ (fcn) sym.func 44
+|   sym.func ();
+|           ; var int local_5h @ rbp-0x5
+|           ; var int local_4h @ rbp-0x4
+|              ; CALL XREF from 0x55b8bc8c9693 (sym.main)
+|           0x55b8bc8c96a4      55             push rbp
+|           0x55b8bc8c96a5      4889e5         mov rbp, rsp
+|           0x55b8bc8c96a8      4883ec10       sub rsp, 0x10
+|           0x55b8bc8c96ac      c645fb61       mov byte [local_5h], 0x61 ; 'a' ; 97
+|           0x55b8bc8c96b0      0fbe45fb       movsx eax, byte [local_5h]
+|           0x55b8bc8c96b4      8945fc         mov dword [local_4h], eax
+|           0x55b8bc8c96b7      8b45fc         mov eax, dword [local_4h]
+|           0x55b8bc8c96ba      89c6           mov esi, eax
+|           0x55b8bc8c96bc      488d3d910000.  lea rdi, qword [0x55b8bc8c9754] ; "%d"
+|           0x55b8bc8c96c3      b800000000     mov eax, 0
+|           0x55b8bc8c96c8      e883feffff     call sym.imp.printf     ; int printf(const char *format)
+|           0x55b8bc8c96cd      90             nop
+|           0x55b8bc8c96ce      c9             leave
+\           0x55b8bc8c96cf      c3             ret
+[0x55b8bc8c96a4]&gt; 
+</code></pre></div></div>
+<p>This one is mega simple, the thing happens here:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>|           0x55b8bc8c96ac      c645fb61       mov byte [local_5h], 0x61 ; 'a' ; 97
+|           0x55b8bc8c96b0      0fbe45fb       movsx eax, byte [local_5h]
+|           0x55b8bc8c96b4      8945fc         mov dword [local_4h], eax
+|           0x55b8bc8c96b7      8b45fc         mov eax, dword [local_4h]
+</code></pre></div></div>
+<p>byte 0x61 (ascii a) is stored in local_5h, good that should mean char b = ‘a’, then it goes to EAX (we don’t use rax, as the var is a single byte) and from there it goes to local_4h and that should mean int x = (int) b; then params are passed and printf is called, easy. movsx is used here as it moves with sign extension is it a common technique to use it when it comes to casting from int to char and from char to int (more info: https://stackoverflow.com/questions/7762214/assembly-converting-mov-movzx-and-movsx-to-c-code-no-inline-asm)</p>
+
+<p>Let’s finish this one with a last example</p>
+
+<pre><code class="language-C"># include &lt;stdio.h&gt;
+
+main(){
+
+ func();    
+ getchar();
+}
+
+func(){
+char b = 'a';
+
+int x = (int)b;
+printf ("%d\n", x);
+printf ("%d\n", b);
+
+}
+</code></pre>
+<p>As you can see, we start with the chracter ‘a’ we store it as both char and int using two variables and then we print both. The key thing to note here is that both of the times we pass the format string %d to printf, as %d is for printing the int value, we’ll get 97 as the output both of the times! So 0x61 represents both 97 dec and ascii ‘a’ it is the same, the only diference here is that if we pretend to store an int we’ll need two times the space of a char, that’s all. The output format will depend on the format string in printf.</p>
+
+<p>Let’s see</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0x5570cc50c6a4]&gt; pdf
+/ (fcn) sym.func 67
+|   sym.func ();
+|           ; var int local_5h @ rbp-0x5
+|           ; var int local_4h @ rbp-0x4
+|              ; CALL XREF from 0x5570cc50c693 (sym.main)
+|           0x5570cc50c6a4      55             push rbp
+|           0x5570cc50c6a5      4889e5         mov rbp, rsp
+|           0x5570cc50c6a8      4883ec10       sub rsp, 0x10
+|           0x5570cc50c6ac      c645fb61       mov byte [local_5h], 0x61 ; 'a' ; 97
+|           0x5570cc50c6b0      0fbe45fb       movsx eax, byte [local_5h]
+|           0x5570cc50c6b4      8945fc         mov dword [local_4h], eax
+|           0x5570cc50c6b7      8b45fc         mov eax, dword [local_4h]
+|           0x5570cc50c6ba      89c6           mov esi, eax
+|           0x5570cc50c6bc      488d3db10000.  lea rdi, qword [0x5570cc50c774] ; "%d\n"
+|           0x5570cc50c6c3      b800000000     mov eax, 0
+|           0x5570cc50c6c8      e883feffff     call sym.imp.printf     ; int printf(const char *format)
+|           0x5570cc50c6cd      0fbe45fb       movsx eax, byte [local_5h]
+|           0x5570cc50c6d1      89c6           mov esi, eax
+|           0x5570cc50c6d3      488d3d9a0000.  lea rdi, qword [0x5570cc50c774] ; "%d\n"
+|           0x5570cc50c6da      b800000000     mov eax, 0
+|           0x5570cc50c6df      e86cfeffff     call sym.imp.printf     ; int printf(const char *format)
+|           0x5570cc50c6e4      90             nop
+|           0x5570cc50c6e5      c9             leave
+\           0x5570cc50c6e6      c3             ret
+[0x5570cc50c6a4]&gt; 
+[0x5570cc50c6a4]&gt; afvd
+var local_5h = 0x7ffce6d687eb  0xd688000000006161   aa......
+var local_4h = 0x7ffce6d687ec  0xe6d6880000000061   a.......
+[0x5570cc50c6a4]&gt; dc
+97
+97
+</code></pre></div></div>
+<p>At the end it’s all just a matter of interpretation</p>
+
+<p>That was very short, on the</p>
+
+            </div>
+            <footer class="post-footer">
+                
+                <p class="post-tags">
+                     
+                    <a href='https://artik.blue/tag/reversing/'>reversing</a>
+                    
+                     
+                    <a href='https://artik.blue/tag/c/'>c</a>
+                    
+                     
+                    <a href='https://artik.blue/tag/radare/'>radare</a>
+                    
+                    
+                </p>
+                
+                <div class="post-share">
+                    <span class="post-share-title">Share:</span>
+                    <a target="_blank" href="https://twitter.com/share?text=Reverse+engineering+32+and+64+bits+binaries+with+Radare2+-+5+%28var+types+and+casting%29&amp;url=https://artik.blue/reversing-radare-5">Twitter</a>
+                    <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://artik.blue/reversing-radare-5">Facebook</a>
+                </div><!-- .share-post -->
+            </footer>
+            <div class="author-box">
+                <div class="author-avatar"><img src="assets/images/avatar.png" alt="Artikblue's Picture"
+                        class="avatar"></div>
+                <div class="author-details">
+                    <h2 class="author-title">About Artikblue</h2>
+                    <p class="author-description"></p>
+                </div>
+            </div>
+            
+<section id="comments-area" class="comments-area">
+    <h2 class="comments-title">Comments</h2>
+    <div class="comments-inside">
+        <div id="disqus_thread"></div>
+    </div><!-- .comments-inside -->
+    <div id="comments-overlay" class="comments-overlay">
+        <a href="reversing-radare-5.html#" id="comments-show" class="comments-show">Show comments</a>
+    </div><!-- .comments-overlay -->
+    <script type="text/javascript">
+        var disqus_shortname = 'artikblue';
+        var disqus_developer = 0;
+        (function () {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+        </article>
+        
+        <section class="read-next inner">
+            <h2 class="read-next-title">Read Next</h2>
+            
+            <article class="post">
+                <header class="post-header">
+                    <div class="post-meta">
+                        <time class="published" datetime="April 30, 2020">April 30, 2020</time>
+                    </div>
+                    <h3 class="post-title"><a href="reversing-radare-4-ii.html">Reverse engineering 32 and 64 bits binaries with Radare2 - 4 - II (more strings)</a></h3>
+                    <p class="post-tags">
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/reversing/'>Reversing</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/c/'>C</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/radare/'>Radare</a>
+                        
+                        
+                        
+                    </p>
+                </header>
+                
+                <a href="reversing-radare-4-ii.html" class="post-thumbnail">
+                    <img src="assets/images/radare2/radare2_5.png" alt="Reverse engineering 32 and 64 bits binaries with Radare2 - 4 - II (more strings)" />
+                </a>
+                
+            </article>
+            
+            
+            <article class="post">
+                <header class="post-header">
+                    <div class="post-meta">
+                        <time class="published" datetime="May 2, 2020">May 2, 2020</time>
+                    </div>
+                    <h3 class="post-title"><a href="reversing-radare-6.html">Reverse engineering 32 and 64 bits binaries with Radare2 - 6 (2d arrays and structs)</a></h3>
+                    <p class="post-tags">
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/reversing/'>Reversing</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/c/'>C</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/radare/'>Radare</a>
+                        
+                        
+                        
+                    </p>
+                </header>
+                
+                <a href="reversing-radare-6.html" class="post-thumbnail">
+                    <img src="assets/images/radare2/radare2_7.png" alt="Reverse engineering 32 and 64 bits binaries with Radare2 - 6 (2d arrays and structs)" />
+                </a>
+                
+            </article>
+            
+        </section><!-- .read-next -->
+    </main><!-- .site-main -->
+</div><!-- .site-content -->
+
+        
+
+        
+
+        <footer id="colophon" class="site-footer outer">
+            <div class="site-footer-inside">
+                <p class="social-links">
+    
+    <a href="https://twitter.com/artikblue" target="_blank">
+        <span class="fa-twitter fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">Twitter</span>
+    </a>
+    
+    
+    
+    <a href="https://github.com/artikblue" target="_blank">
+        <span class="fa-github fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">GitHub</span>
+    </a>
+    
+    
+    
+    
+    <a href="https://medium.com/@artikblue" target="_blank">
+        <span class="fa-medium fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">medium</span>
+    </a>
+    
+    
+    
+    
+    
+</p>
+                <p class="site-info">
+                    <a href="reversing-radare-5.html#">Artik blue</a> &copy; 2020 . Horace theme by
+                    <a target="_blank" href="https://justgoodthemes.com/">JustGoodThemes</a>. <br />
+                    Powered by <a target="_blank" href="https://jekyllrb.com/">Jekyll</a>.
+                </p>
+                <p class="back-to-top">
+                    <a id="top-button" class="top-button" href="reversing-radare-5.html#page">
+                        <span class="icon-arrow-up" aria-hidden="true"></span>
+                        <span class="screen-reader-text">Back to top</span>
+                    </a>
+                </p>
+            </div><!-- .site-footer-inside -->
+        </footer><!-- .site-footer -->
+    </div><!-- .site -->
+    <div id="site-overlay" class="site-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+	<div class="sidebar-scrollable">
+		<div class="sidebar-inside">
+			<button id="sidebar-hide" class="sidebar-toggle"><span class="screen-reader-text">Close Sidebar</span><span
+				    aria-hidden="true" class="icon-close"></span></button>
+			<nav id="sidebar-navigation" class="widget site-navigation">
+				<h2 class="widget-title">Explore Site</h2>
+				<ul class="menu">
+					
+						<li class="menu-item"><a href="about.html">About</a></li>
+					
+						<li class="menu-item"><a href="reversing.html">Reversing</a></li>
+					
+				</ul>
+			</nav>
+			
+<section class="widget widget-text">
+    <h2 class="widget-title">About Artik blue</h2>
+    <p>Alternate use of modern technology also known as hacking.</p>
+</section>
+
+
+<section class="widget widget-recent-posts">
+    <h2 class="widget-title">Recent Articles</h2>
+    <ul>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">December 1, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="shodan-intelligence-1.html">Generating contextual geographic intelligence with shodan</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="shodan-intelligence-1.html">
+                <img src="assets/images/shodan.png"
+                    alt="Generating contextual geographic intelligence with shodan">
+            </a>
+            
+        </li>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">June 4, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="reversing-radare-16.html">Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="reversing-radare-16.html">
+                <img src="assets/images/radare2/radare2_17.png"
+                    alt="Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)">
+            </a>
+            
+        </li>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">June 3, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="opsec-2.html">Operational security techniques in asymmetric conflicts - II (device acquisitions)</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="opsec-2.html">
+                <img src="assets/images/opsec/opsec2.png"
+                    alt="Operational security techniques in asymmetric conflicts - II (device acquisitions)">
+            </a>
+            
+        </li>
+        
+    </ul>
+</section>
+
+<!-- Create a sorted array of tags -->
+ 
+<section class="widget widget-tagcloud">
+    <h2 class="widget-title">Tags</h2>
+    <div class="tagcloud">
+        
+        <a href='https://artik.blue/tag/analysis/'>analysis</a>
+        
+        <a href='https://artik.blue/tag/anonymous/'>anonymous</a>
+        
+        <a href='https://artik.blue/tag/apis/'>apis</a>
+        
+        <a href='https://artik.blue/tag/arduino/'>arduino</a>
+        
+        <a href='https://artik.blue/tag/asm/'>asm</a>
+        
+        <a href='https://artik.blue/tag/asyncio/'>asyncio</a>
+        
+        <a href='https://artik.blue/tag/atmel/'>atmel</a>
+        
+        <a href='https://artik.blue/tag/c/'>c</a>
+        
+        <a href='https://artik.blue/tag/communities/'>communities</a>
+        
+        <a href='https://artik.blue/tag/hacktivism/'>hacktivism</a>
+        
+        <a href='https://artik.blue/tag/hacktivists/'>hacktivists</a>
+        
+        <a href='https://artik.blue/tag/linux/'>linux</a>
+        
+        <a href='https://artik.blue/tag/opsec/'>opsec</a>
+        
+        <a href='https://artik.blue/tag/processing/'>processing</a>
+        
+        <a href='https://artik.blue/tag/python/'>python</a>
+        
+        <a href='https://artik.blue/tag/r/'>r</a>
+        
+        <a href='https://artik.blue/tag/radare/'>radare</a>
+        
+        <a href='https://artik.blue/tag/relay/'>relay</a>
+        
+        <a href='https://artik.blue/tag/reversing/'>reversing</a>
+        
+        <a href='https://artik.blue/tag/shellcode/'>shellcode</a>
+        
+        <a href='https://artik.blue/tag/shodan/'>shodan</a>
+        
+    </div>
+</section>
+
+
+		</div><!-- .sidebar-inside -->
+	</div><!-- .sidebar-scrollable -->
+</aside><!-- .sidebar -->
+    
+  <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '', { 'anonymize_ip': true });
+  </script>
+
+    <!-- Javascript Assets -->
+    <script src="assets/js/jquery-3.3.1.min.js"></script>
+    <script src="assets/js/plugins.js"></script>
+    <script src="assets/js/custom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+
+</html>

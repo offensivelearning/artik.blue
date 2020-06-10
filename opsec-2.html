@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+        <title>Operational security techniques in asymmetric conflicts - II (device acquisitions)</title>
+        <meta name="description" content="Secure device acquisitions">
+        <link rel="canonical" href="opsec-2.html">
+    
+
+    <!-- Site Favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/png" />
+
+    <!-- Font Embed Code -->
+    <link href="https://fonts.googleapis.com/css?family=Karla:400,400i,700,700i" rel="stylesheet" />
+
+    <!-- CSS Styles -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/light.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+    
+
+</head>
+
+
+
+<body class="layout-post">
+    <div id="page" class="site">
+
+        
+        <header id="masthead" class="site-header outer">
+    <div class="site-header-inside">
+        <div class="site-branding">
+            
+                <p class="site-logo"><a href="index.html" rel="home"><img src="assets/images/logo.png" alt="Artik blue" /></a></p>
+                <h1 class="site-title screen-reader-text"><a href="opsec-2.html" rel="home">Artik blue digital thoughts</a></h1>
+            
+        </div><!-- .site-branding -->
+        <nav id="main-navigation" class="site-navigation" aria-label="Primary Navigation">
+            <ul class="menu">
+            
+                <li class="menu-item"><a href="about.html">About</a></li>
+            
+                <li class="menu-item"><a href="reversing.html">Reversing</a></li>
+            
+            </ul>
+            <button id="sidebar-show" class="sidebar-toggle"><span class="screen-reader-text">Open Sidebar</span><span class="icon-more" aria-hidden="true"></span></button>
+        </nav><!-- .site-navigation -->
+    </div><!-- .site-header-inside -->
+</header><!-- .site-header -->
+        
+
+        <div id="content" class="site-content fadeInDown delay_075s">
+    <main id="main" class="site-main outer">
+        <article class="post-full inner">
+            <header class="post-header">
+                <div class="post-meta">
+                    <time class="post-date" datetime="2020-06-03">June 3,
+                        2020</time>
+                </div><!-- .post-meta -->
+                <h1 class="posttitle">Operational security techniques in asymmetric conflicts - II (device acquisitions)</h1>
+            </header><!-- .post-header -->
+            
+            <div class="post-thumbnail"><img class="featured-image img-fluid" src="assets/images/opsec/opsec2.png"
+                    alt="Operational security techniques in asymmetric conflicts - II (device acquisitions)"></div>
+            
+            <div class="post-content">
+                <h3 id="secure-device-acquisitions">Secure device acquisitions</h3>
+
+<p>It is very important to remark that our first interaction with the device and therefore the organization’s (the one we belong in) with the device begins at the very moment we decide to acquire. I dare to affirm that the average reader is not in possession of an advanced electronics lab and a or a smartphone factory (I guess that the reader would have a whole set of different problems in that case) and unfortunately for us the old <em>yogurt-phone</em> is very impractical when it comes to the operational activity therefore we’ll have acquire a personal device somewhere out there is a safe way.</p>
+
+<p>This section will be about that.</p>
+
+<p>The acquisition of those “operational” devices can be done in several ways, each of them presenting a series of associated risks. As min many contexts in life, especially when it comes to operational activities, there is no magic recipe, no master trick or shortcut, therefore we must know about enough appropiate alternatives along with their risks to be able to decide according to our personal context.</p>
+
+<h4 id="online-acquisitions">Online acquisitions</h4>
+
+<p>In our daily life, nowadays, this will probably be our prefeered purchasing option, the one that we are most used to, mainly due to its comfort and effectivenes. However in terms of operantional security, this may not be the best way to acquire a device.</p>
+
+<p>When we acquire a device through an online store we must take several associated peculiarities into account. First of all, we must be aware that an “online store” is still a piece of software installed on a computer system, so any kind of interaction we may make with it is subject to being stored and tracked for an indefinite number of time. So, for purchasing a new device such a laptop or a smartphone in an online store in general terms we’ll start by needing to create a new user and for that to provide som personal information as the first and lastnames along with an e-mail, such data can be easily faked and we can create “anonymous” e-mails easily, however we’ll also need to provide a valid delivery address along with a payment method (a credit card for example) and that’ll be harder to “fake”, “unlink from us” or “cheat”. Data like that as it will be stored in a computer system is always subject to being accessed not only by the store owners but also by third parties: On one hand a police agency may access that data by making use of some judicial warrant/order on the other hand a potential adversary with enough time/skill/money can access that (your) information through for example some kind of computer attack or by accessing (“buying”) an internal employee on the site.</p>
+
+<p>So that would be the first risk associated with this method, the risk of having our personal identity being linked to the site especially via the payment and the delivery address, we’ll call it the “identity” risk. The mitigation of this kind of risk is possible however it can be complicated espepcially in future days as the banking sector and the payment industry harden their identity checks and enhance their fraud mitigation systems…</p>
+
+<p>Regarding to data such as personal names or e-mails, as mentioned, those can be easily faked, the first and last names can be easily faked and any kind of free mail server that does not require a valid phone number such as protonmail or gmx can be used to create a custom mail address anonymously by using a VPN or TOR. But when it comes to the physical delivery address, you just can let your imagination fly sky high as there are many custom ways of making <em>effective and safe deliveries</em> and those will depend a lot on your personal context and the kind of adversary you may have. Nowadays many online stores like amazon do offer the change of having the package sent to a specific delivery point, once the package arrives only some digit combination is needed to unlock the thing and get it, this may partially solve the problem but note that the store will still have the record of the purchase  including the virtual payment. Some other sites would send the package to physical delivery points located inside actual physical stores for an easy pick-up, but those would probably requiere a driving license / personal id card or some kind of document as a proof of identity (for obvious reasons).</p>
+
+<p>Another strategy that may be valid for you and partially solves the problem as well consists in sending the package to a small business somewhere far from your place and then picking it up there to avoid a potential identification from being recorded.</p>
+
+<p>This scheme is easy: first of all you’ll locate a small business like a small shop or a bar in an area that is far from the “operational area” or your usual residence. Then you’ll send the package there. Once you detect that the package has reached the destination, you can simple show up there and claim it, saying something like you are just and neighbor and this package was very important and you were not home so you told the delivery person just to send it there, they will probably believe you as you’ll show details stating that about the package that has just arrived and no one has ordered there, you can still show your id as a proof, they’ll just forget about your name after a couple of hours so… identification risk is low there.</p>
+
+<p>You may think that previously contacting the people in charge of the place you’ll deliver to, to arange the whole thing is very important or even mandatory but just note that if you do this a couple of things can happen: they may simply refuse “your offer” to avoid potential complications and extra work, they may also start asking uncomfortable questions or on the other hand they may accept our proposal but then show excessive curiosity towards the package, and we don’t want that. We have to take the possibility of us being under an actual police/pe/intelligence investigation into account, so an actual adversary can be somehow be at our footsteps making the pertinent investigations on our relationship with the small shop/bar. So the spontaneous and the unpredictable is always the most difficult to trace. Again, we’ll chosee the strategy that best suits us according to the context of the chosen establishment and our own context (do we have any evidence or strong indicators that we are being followed or under a formal investigation?) but generally speaking, it is usually a good thing to do some social engineering and have a good relationship with the place we are going to deliver to, especially if we want to use it as a deliver place for a set of packages over time during a certain period, if we just want to receive a single order there is no need of doing that. Whatever the strategy you decide to follow, it would be preferable to do not warn the owner about new arrivals and just get to the place as soon as the package arrived to avoid unnecessary questions and curiosity. Experience has shown me that local small establishments, run by women, elderly people and / or foreign population, usually work well for this kind of operations. A good strategy when picking up orders that just arrived is to spend some time at the establishment ordering something like a coffee or a soda and just before paying use the chosen cover-up to claim the package and once received, leave the establishment without further interaction.</p>
+
+<p>Although this may not be the best way to solve a situation of this nature, we should always have a certain amount of cash as a kind of emergency escape plan to be used in a potential negotiation with the person in charge of the shop/bar if things go wrong and he gets angry, refuses to deliver the package or poses any threat, again a previous study on the place is important and should be taken. We should add that in case of doubt it is always preferable to (politely) hand some cash to the person in charge as some sign of “goodwill” as an apology for the inconvenience (of having to carry the package in the place without knowing anything) than waiting for a conflict to arise offering then the money to get out of trouble (depending on the situation this can arise more suspicion on the person and this escalate the conflict).</p>
+
+<p>When it comes to the method of payment, we face a much more complex problem, as the financial industry has made many many efforts in recent years to establish strong identity controls in everything that has to do with economic transactions. Most online stores will requiere payments by credit card or paypal or bank transfers. Among all of the methods, perhaps we can think that paying with cash as the product arrives can be the most anonymous, however, if establishing a safe delivery place can be a tough job getting the person in charge of the place to pay cash for us is simply madness.  In general terms, as far as when it comes to the payment we see that if we solve a particular problem like the delivery we then generate another one on the payment method as we need to obtain a fake id or an anonymous credit card / payment system. Regarding to the payment system, depending on the platform we are using and the country we live in, we’ll probably have the chance to get some pre-paid credit cards that can be easily bought with cash on many gas stations / small shops and use them for online payments, but that won’t work on some places due to legal stuff. If we don’t have this chance things get tough, nowadays there are a large set of sites out there, where one can acquiere credit card data obtained from third parties in cyber attacks, of course one can also try to carry those attacks himself to get the data that will then be used for “anonymous” payment. I want to make it clear that I personally do not encourage you to do it and from a strategical point of view as doing that is considered a crime it can generate many more problems than possible solutions, so take it as the recommendation of a thing to potentially avoid. We have more alternatives though, another one would be to use payment systems such as bitcoin, monero or other crypto curriencies. Currently, many sites, including online stores offer this payment option and in the case they only accept credit cards, there are sites like bitpay that may allow us to obtain credit card d ata from a bitcoin wallet with little personal information requiered. We’ll go into more detail about safe payment methods further on on this series bur for now we must bear in mind that on the process of the acquisition of cryptocurrency it is always convenient to pay in cash for obvious reasons, using any of the many bitcoin ATMs available in any medium-sized city across US and Europe. So once the crypto has been acquired, it must be loaded into a wallet on secure device, that device should not be tied to a real identity and always use a secure connection it is always convinient to split our crypto in different wallets (especially with bitcoin) one wallet for each kind of operation, as having all of it on a single one can reveal sensible information such as the list of transactions if that address is discovered by a potential adversary.</p>
+
+<p>So far in this section, we have addressed the problem of getting devices online paying attention to the resisks of “linking” the device to our phisical person and therefore to the possible traceability of our operations, however this may not be the only risk we face here when acquiring online. There is a possibilitty that our adversary is already concearned about our activities and thus is actively monitoring us, so that our identity, our affiliation and even the kind of activities we carry out are already known to him (or at leat it has some general ideal on it). In this particular case, what our adversary will look for will be a close monitorization on us so delving into the type of activities we carry out, obtaining as much detail as possibe on them as well as preventing us from escaping  the monitorization by for example getting a new clean secure device. Our adversary can therefore try to take advantage of the moment we acquire a new device to send us a previously tapped device in order to initiate or expand a close monitorization process. We can call this the pre-intervention risk.</p>
+
+<p>We must have very clear that the pre-intervention (or swap) of the device we are ordering can be carried out in any stage of the distribution chain, especially within the facilities of the online store and when te device is in charge of the distribution company. As fore the swap, this can be done in a totally transparent way to the recipient (us), an experience professional can easily unseal and re-seal a phone/computer case in very short time. Threat modeling is also important in this particular context, it is clear that a company located inside a hostile country/territory will do the best when it comes protecting their facilities from interventions from their enemies and thus won’t cooperate at all, if we buy from a company located in the same country we are operating, that company can be easily asked for cooperation. However we must bear in mind that once the device is sent and is in charge of the transport company the context changes, the intervention can happen at that point. We’ll need to select a valid transport company and ultimately assume the risk.</p>
+
+<h4 id="acquisition-on-physical-stores">acquisition on physical stores</h4>
+
+<p>This is probably the best option when it comes to ordering a new operational device and the most widely used by most clandestine organizations and privacy-concerned individudals. Acquiring a device in a physical store is somewhat simple and most stores can offer us decent devices from most brands.</p>
+
+<p>When selecting a store for buying there, we’ll focus on large stores on big malls, preferably the ones without video cameras around and far from our habitual areas of residence and operations. We’ll carry out the transaction pying in cash and spending as little time as possible on site. When buying new devices we’ll try to avoid previously visited stores.</p>
+
+<p>Said that, we must remember that getting our devices on physical stores offers an extra layer of security when it comes to our identity but it is not a full guarantee against pre-intervention risks. A physical store is equally susceptible to being intervened in some way by the gov or infiltrated by some hostile organization, if our adversary knows about our acquisition plans he/she can act accordingly in the store, although, we need to apply common sense here, we are in the worst-case scenario and an operation like this one, especially if we are “random” enough can be almost imposible (there can be tons of different devices to select from in a big mall, our adversary cannot tap each of them). Anyway, therefore, we must try to act without following any established pattern, communicating our plans to the minimum number of people.</p>
+
+<h4 id="on-used-devices">On used devices</h4>
+
+<p>Snow white taught us that accepting gifts from stranges is a risky activity that sometimes can lead to fatal consequences. As it could not be otherwise, the same case applies to our activities.</p>
+
+<p>As the volume of the organization, the number of its activities or they impact increases, the interest of third parties to obtain information on it or influence its activity will also increase. Because of this, our adversaries will try to approach us through all possible means. One of the most frequent methods of approximation will be the use of some kind of human source that in exchange for some type of benefit will provide information related to us/our activities to a hostile third-party or even perform some hostile action on us. Any of our friends colleagues and partners is suscpetible to being turned against our interests of the right incentive is presented in front of him/her, especially those who present specific personal vulnerabilities.</p>
+
+<p>Starting, as always, from the worst case scenario, we must assume that our adversaries will eventually be present inside our innter circles, either inside our personal environment (friends and such) or in the workplace. One of the fastest and most effective way of getting us under track is through a tapped electronic device such as a computer or a smartphone, so our adversary will ultimately try to get one of those devices infected… or to get one infected device in our hands.</p>
+
+<p>We must be aware of spontaneous “electronic” presents offered by our friends, especially by “recent” friends as they may come infected. We must be very aware when buying second-hand stuff as well, it is not recommended to buy from second hand markets or to buy used devices to random people on the street, again for obvious reasons.</p>
+
+<h4 id="selection-criteria-for-new-devices">Selection criteria for new devices</h4>
+
+<p>THe kind of device to use ust always be determined by our needs, our capabilities and the kind of adversary we face. In this section we’ll present some basic criteria to take into account when choosing a new smartphone or computer for operational activity.</p>
+
+<p>First of all, we need to know about our necessities, how will we use the electronic devices. If we only need to make simple, short and occasional communications, for quickly coordination an action going on on site or for simple coded short messages and such an old non smart phone can fit perfectly, that is a phone on we won’t be able to install any app, reducing the attack surface this way. If we need to send/receive multimedia content such as video, photo or we need to get access to advanced apps or use the internet we’ll need a smartphone.</p>
+
+<p>Smartphones present a quite special context, because unline personal computers, when it comes ti phones we’ll rarely be able to choose the operating system, we’ll depend on the manufacturer instead, so he’ll provide the os along with software updates, that is especially evident in Apple devices. Regarding to Android devices, on some occasions we may need to break the securitty of the device in order to install other operating systems (such as lineageos) that may allow us to come with more custom and desirable operating systems but we’ll end up with a “rooted” device making things easy for our adversary to tap our device, so jailbreaking/rooting a device is highly un-recommended for security reasons. When choosing our smartphone we’ll often see ourselves choosing between Apple and Android and there is a huge debate on security between apple-android fanboys/fangirls, of course this post does not aim to sell you a particular device.</p>
+
+<p>In terms of security, the most advanced models of Android devices are practically on par with the latest iPhones.The latter may have been offering security updates on a more continuous basis, even on older models, mainly due to the fact that the same company is in charge of the manufacturing of the devices as well as the software having a very limited range of models, however the difference is minimal with the high-end Android devices. And in that we must look precisely at this case. As Apple devices are very specific products, associated with luxury and frequently used by VIPs from the scene of politics and  business, they will very frequently arouse the interest of all types of organizations and hackers, both criminal and government, which will invest large amounts of money to develop or acquire intervention systems for them. On the other hand, some specific Android phone models such as the most advanced Samsung or some Huaweii may arouse a similar interest, to this it should also be added that since the Android source code is more accessible and there is numerous documentation on the matter available on the internet, developing some kind of artifact or collection system for Android can be just as easy.</p>
+
+<p>If our adversary is low on money and time, an iPhone-type phone offers good security guarantees, if our adversary has great economic resources, we must be clear that he will be able to acquire intervention systems for iPhone (or Samsung or Huaweii …) easily and quickly, so in that case it would be a good idea to use a rare but well-updated Android device (OnePlus? Alcatel?) because the data acquisition /tapping systems are often adapted to the peculiarities of specific models (the most used). However, if our adversary is small, but has time and high technical skills, he won’t be able (probably) to afford any advanced acquisition system for high-end iPhone or Android, but perhaps he has the ability to carry out  “ad- hoc”/custom attacks towards less protected low-end Android devices. So, as we can see, threat modeling becomes especially important when choosing our devices, especially regarding smartphones.</p>
+
+<p>When it comes o laptops, the main attack vector that we must worry about will be the BIOS since once we have the computer we will be able to select the operating system that best suits our needs. The BIOS is the software that is responsible for recognizing the input and output devices of the computer and allows it to load the operating system. Normally this software is given to us by the manufacturer of the device and we usually have very little control over it. The main characteristic that we must take into account in relation to the BIOS is that said software is independent of the operating system, so it will remain intact if we format our hard drives or reinstall the system. By controlling the input and output of our device, the BIOS can be intervened to monitor user activity (for example, keystrokes). The intervention of a system like this, despite being perfectly viable, is not an easy task and will require physical access to the device, so we can expect such an attack from an advanced adversary, such as a government or a large organization. . Theoretically, all BIOS systems can be vulnerable to this attack, however each one can present particular characteristics that require tailored development, so we should expect that the most popular models will be more vulnerable to this type of attack. The best strategy to deal with this is prevention, following the recommendations regarding the acquisition of devices and maintaining proper custody of them, the risks should be minimal. If one suspects that he or she has been the victim of an attack like this, the best option will be, depending on the context, either to get rid of the device immediately or to use it to disinform the adversary.</p>
+
+<p>As for desktop computers, there is no special brand or model that stands out to a great extent over the rest, in fact, it is often observed how users of this type of computer usually configure and assemble it themselves, acquiring the parts according to their needs. If we are going to require a desktop computer, we should in any case try to have a BIOS system that offers the best security guarantees such as an access password taking into account the same aspects presented for laptops.</p>
+
+            </div>
+            <footer class="post-footer">
+                
+                <p class="post-tags">
+                     
+                    <a href='https://artik.blue/tag/opsec/'>opsec</a>
+                    
+                    
+                </p>
+                
+                <div class="post-share">
+                    <span class="post-share-title">Share:</span>
+                    <a target="_blank" href="https://twitter.com/share?text=Operational+security+techniques+in+asymmetric+conflicts+-+II+%28device+acquisitions%29&amp;url=https://artik.blue/opsec-2">Twitter</a>
+                    <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://artik.blue/opsec-2">Facebook</a>
+                </div><!-- .share-post -->
+            </footer>
+            <div class="author-box">
+                <div class="author-avatar"><img src="assets/images/avatar.png" alt="Artikblue's Picture"
+                        class="avatar"></div>
+                <div class="author-details">
+                    <h2 class="author-title">About Artikblue</h2>
+                    <p class="author-description"></p>
+                </div>
+            </div>
+            
+<section id="comments-area" class="comments-area">
+    <h2 class="comments-title">Comments</h2>
+    <div class="comments-inside">
+        <div id="disqus_thread"></div>
+    </div><!-- .comments-inside -->
+    <div id="comments-overlay" class="comments-overlay">
+        <a href="opsec-2.html#" id="comments-show" class="comments-show">Show comments</a>
+    </div><!-- .comments-overlay -->
+    <script type="text/javascript">
+        var disqus_shortname = 'artikblue';
+        var disqus_developer = 0;
+        (function () {
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+        </article>
+        
+        <section class="read-next inner">
+            <h2 class="read-next-title">Read Next</h2>
+            
+            <article class="post">
+                <header class="post-header">
+                    <div class="post-meta">
+                        <time class="published" datetime="June 1, 2020">June 1, 2020</time>
+                    </div>
+                    <h3 class="post-title"><a href="reversing-radare-15.html">Reverse engineering x64 binaries with Radare2 - 16 (unix sockets fundamentals)</a></h3>
+                    <p class="post-tags">
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/reversing/'>Reversing</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/c/'>C</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/radare/'>Radare</a>
+                        
+                        
+                        
+                    </p>
+                </header>
+                
+                <a href="reversing-radare-15.html" class="post-thumbnail">
+                    <img src="assets/images/radare2/radare2_16.png" alt="Reverse engineering x64 binaries with Radare2 - 16 (unix sockets fundamentals)" />
+                </a>
+                
+            </article>
+            
+            
+            <article class="post">
+                <header class="post-header">
+                    <div class="post-meta">
+                        <time class="published" datetime="June 4, 2020">June 4, 2020</time>
+                    </div>
+                    <h3 class="post-title"><a href="reversing-radare-16.html">Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)</a></h3>
+                    <p class="post-tags">
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/reversing/'>Reversing</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/c/'>C</a>
+                        
+                        
+                        
+                        <a href='https://artik.blue/tag/radare/'>Radare</a>
+                        
+                        
+                        
+                    </p>
+                </header>
+                
+                <a href="reversing-radare-16.html" class="post-thumbnail">
+                    <img src="assets/images/radare2/radare2_17.png" alt="Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)" />
+                </a>
+                
+            </article>
+            
+        </section><!-- .read-next -->
+    </main><!-- .site-main -->
+</div><!-- .site-content -->
+
+        
+
+        
+
+        <footer id="colophon" class="site-footer outer">
+            <div class="site-footer-inside">
+                <p class="social-links">
+    
+    <a href="https://twitter.com/artikblue" target="_blank">
+        <span class="fa-twitter fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">Twitter</span>
+    </a>
+    
+    
+    
+    <a href="https://github.com/artikblue" target="_blank">
+        <span class="fa-github fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">GitHub</span>
+    </a>
+    
+    
+    
+    
+    <a href="https://medium.com/@artikblue" target="_blank">
+        <span class="fa-medium fa" aria-hidden="true"></span>
+        <span class="screen-reader-text">medium</span>
+    </a>
+    
+    
+    
+    
+    
+</p>
+                <p class="site-info">
+                    <a href="opsec-2.html#">Artik blue</a> &copy; 2020 . Horace theme by
+                    <a target="_blank" href="https://justgoodthemes.com/">JustGoodThemes</a>. <br />
+                    Powered by <a target="_blank" href="https://jekyllrb.com/">Jekyll</a>.
+                </p>
+                <p class="back-to-top">
+                    <a id="top-button" class="top-button" href="opsec-2.html#page">
+                        <span class="icon-arrow-up" aria-hidden="true"></span>
+                        <span class="screen-reader-text">Back to top</span>
+                    </a>
+                </p>
+            </div><!-- .site-footer-inside -->
+        </footer><!-- .site-footer -->
+    </div><!-- .site -->
+    <div id="site-overlay" class="site-overlay"></div>
+    <aside id="sidebar" class="sidebar">
+	<div class="sidebar-scrollable">
+		<div class="sidebar-inside">
+			<button id="sidebar-hide" class="sidebar-toggle"><span class="screen-reader-text">Close Sidebar</span><span
+				    aria-hidden="true" class="icon-close"></span></button>
+			<nav id="sidebar-navigation" class="widget site-navigation">
+				<h2 class="widget-title">Explore Site</h2>
+				<ul class="menu">
+					
+						<li class="menu-item"><a href="about.html">About</a></li>
+					
+						<li class="menu-item"><a href="reversing.html">Reversing</a></li>
+					
+				</ul>
+			</nav>
+			
+<section class="widget widget-text">
+    <h2 class="widget-title">About Artik blue</h2>
+    <p>Alternate use of modern technology also known as hacking.</p>
+</section>
+
+
+<section class="widget widget-recent-posts">
+    <h2 class="widget-title">Recent Articles</h2>
+    <ul>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">December 1, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="shodan-intelligence-1.html">Generating contextual geographic intelligence with shodan</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="shodan-intelligence-1.html">
+                <img src="assets/images/shodan.png"
+                    alt="Generating contextual geographic intelligence with shodan">
+            </a>
+            
+        </li>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">June 4, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="reversing-radare-16.html">Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="reversing-radare-16.html">
+                <img src="assets/images/radare2/radare2_17.png"
+                    alt="Reverse engineering x64 binaries with Radare2 - 16 - II (more sockets, http emulation, radasm, ragg and shellcode)">
+            </a>
+            
+        </li>
+        
+        <li>
+            <div class="post-header">
+                <div class="post-meta">
+                    <time class="published" datetime="??">June 3, 2020</time>
+                </div>
+                <div class="post-title">
+                    <a href="opsec-2.html">Operational security techniques in asymmetric conflicts - II (device acquisitions)</a>
+                </div>
+            </div>
+            
+            <a class="post-thumbnail" href="opsec-2.html">
+                <img src="assets/images/opsec/opsec2.png"
+                    alt="Operational security techniques in asymmetric conflicts - II (device acquisitions)">
+            </a>
+            
+        </li>
+        
+    </ul>
+</section>
+
+<!-- Create a sorted array of tags -->
+ 
+<section class="widget widget-tagcloud">
+    <h2 class="widget-title">Tags</h2>
+    <div class="tagcloud">
+        
+        <a href='https://artik.blue/tag/analysis/'>analysis</a>
+        
+        <a href='https://artik.blue/tag/anonymous/'>anonymous</a>
+        
+        <a href='https://artik.blue/tag/apis/'>apis</a>
+        
+        <a href='https://artik.blue/tag/arduino/'>arduino</a>
+        
+        <a href='https://artik.blue/tag/asm/'>asm</a>
+        
+        <a href='https://artik.blue/tag/asyncio/'>asyncio</a>
+        
+        <a href='https://artik.blue/tag/atmel/'>atmel</a>
+        
+        <a href='https://artik.blue/tag/c/'>c</a>
+        
+        <a href='https://artik.blue/tag/communities/'>communities</a>
+        
+        <a href='https://artik.blue/tag/hacktivism/'>hacktivism</a>
+        
+        <a href='https://artik.blue/tag/hacktivists/'>hacktivists</a>
+        
+        <a href='https://artik.blue/tag/linux/'>linux</a>
+        
+        <a href='https://artik.blue/tag/opsec/'>opsec</a>
+        
+        <a href='https://artik.blue/tag/processing/'>processing</a>
+        
+        <a href='https://artik.blue/tag/python/'>python</a>
+        
+        <a href='https://artik.blue/tag/r/'>r</a>
+        
+        <a href='https://artik.blue/tag/radare/'>radare</a>
+        
+        <a href='https://artik.blue/tag/relay/'>relay</a>
+        
+        <a href='https://artik.blue/tag/reversing/'>reversing</a>
+        
+        <a href='https://artik.blue/tag/shellcode/'>shellcode</a>
+        
+        <a href='https://artik.blue/tag/shodan/'>shodan</a>
+        
+    </div>
+</section>
+
+
+		</div><!-- .sidebar-inside -->
+	</div><!-- .sidebar-scrollable -->
+</aside><!-- .sidebar -->
+    
+  <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '', { 'anonymize_ip': true });
+  </script>
+
+    <!-- Javascript Assets -->
+    <script src="assets/js/jquery-3.3.1.min.js"></script>
+    <script src="assets/js/plugins.js"></script>
+    <script src="assets/js/custom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+
+</html>
